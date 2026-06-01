@@ -270,16 +270,35 @@
       }
     }
 
-    // Auto-translate
+    // Auto-translate (markdown-safe)
+    function protectMd(text) {
+      const store = [];
+      const ph = s => { store.push(s); return `【${store.length-1}】`; };
+      const r = text
+        .replace(/`[^`\n]+`/g, ph)
+        .replace(/\*\*[^*\n]+\*\*/g, ph)
+        .replace(/~~[^~\n]+~~/g, ph)
+        .replace(/\*[^*\n]+\*/g, ph)
+        .replace(/^#{1,6} /gm, ph)
+        .replace(/^[-*+] /gm, ph)
+        .replace(/^\d+\. /gm, ph)
+        .replace(/^> /gm, ph);
+      return { r, store };
+    }
+    function restoreMd(text, store) {
+      return text.replace(/【(\d+)】/g, (_, i) => store[i] ?? `【${i}】`);
+    }
+
     let translateTimer = null;
     async function autoTranslate(text) {
       if (!text.trim()) { document.getElementById('content-en').value = ''; return; }
       document.getElementById('en-status').textContent = '번역 중...';
       try {
-        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ko|en`);
+        const { r, store } = protectMd(text);
+        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(r)}&langpair=ko|en`);
         const data = await res.json();
         if (data.responseStatus === 200) {
-          document.getElementById('content-en').value = data.responseData.translatedText;
+          document.getElementById('content-en').value = restoreMd(data.responseData.translatedText, store);
         }
       } catch(e) {}
       document.getElementById('en-status').textContent = '';
