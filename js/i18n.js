@@ -29,7 +29,7 @@ const STRINGS = {
 
     // game descriptions
     mini_soccer_desc: 'A chaotic real-time 5v5 soccer game in your browser.',
-    polybattle_desc: 'A fast-paced polygon battle game.',
+    polybattle_desc: 'A fast-paced polygon battle game. Outsmart your opponents and be the last shape standing.',
     great_nature_desc: 'An infinite runner set in a stunning natural world.',
     age_of_sail_desc: 'Sail across endless seas in this infinite runner.',
     ftdas_desc: 'A football tactics board and data analysis system.',
@@ -63,7 +63,7 @@ const STRINGS = {
     footer: '© GENIUS TY.S. All rights reserved.',
 
     mini_soccer_desc: '브라우저에서 즐기는 혼돈의 5v5 실시간 축구 게임.',
-    polybattle_desc: '빠른 템포의 폴리곤 배틀 게임.',
+    polybattle_desc: '빠른 템포의 폴리곤 배틀 게임. 상대를 제압하고 마지막으로 살아남아라.',
     great_nature_desc: '아름다운 자연 세계를 배경으로 한 인피니티 러너.',
     age_of_sail_desc: '끝없는 바다를 항해하는 인피니티 러너.',
     ftdas_desc: '축구 전술 보드 및 데이터 분석 시스템.',
