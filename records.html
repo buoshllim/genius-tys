@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- Global Nav -->
   <nav class="global-nav">
     <a class="nav-logo" href="index.html">GENIUS TY.S.</a>
     <ul class="nav-links">
@@ -27,7 +26,6 @@
     </div>
   </nav>
 
-  <!-- Mobile menu -->
   <div class="mobile-menu" id="mobile-menu">
     <a href="index.html" data-i18n="nav_home">Home</a>
     <a href="games.html" data-i18n="nav_games">Games & Apps</a>
@@ -37,28 +35,46 @@
   <main>
     <section class="tile tile-light">
       <h1 class="display-lg" data-i18n="records_title">Records & Plans</h1>
-      <p class="body-text" style="color: var(--ink-muted-80); margin-top: 12px;" data-i18n="records_sub">My thoughts, progress, and goals.</p>
-      <div class="post-list" id="post-list" style="margin-top: 48px;"></div>
+      <p class="body-text" style="color:var(--ink-muted-80);margin-top:12px;" data-i18n="records_sub">My thoughts, progress, and goals.</p>
+      <div class="post-list" id="post-list" style="margin-top:48px;">
+        <p style="color:var(--ink-muted-48);padding:40px 0;">불러오는 중...</p>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p data-i18n="footer">© GENIUS TY.S. All rights reserved.</p>
-  </footer>
+  <footer><p data-i18n="footer">© GENIUS TY.S. All rights reserved.</p></footer>
 
   <script src="js/i18n.js"></script>
-  <script src="js/posts.js"></script>
+  <script src="js/db.js"></script>
   <script>
-    function onLangChange() {
-      renderPostList(currentLang);
-    }
-    initLang();
-    renderPostList(currentLang);
+    async function renderPosts() {
+      const el = document.getElementById('post-list');
+      const posts = await dbFetchPosts();
 
-    const hamburger = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobile-menu');
-    hamburger.addEventListener('click', () => {
-      mobileMenu.classList.toggle('open');
+      if (!posts.length) {
+        el.innerHTML = `<p style="color:var(--ink-muted-48);padding:40px 0;">${t('records_empty')}</p>`;
+        return;
+      }
+
+      el.innerHTML = posts.map(post => {
+        const title = currentLang === 'ko' ? post.title_ko : post.title_en;
+        const catKey = post.category === 'record' ? 'cat_record' : 'cat_plan';
+        const catClass = post.category === 'record' ? 'cat-record' : 'cat-plan';
+        return `
+          <a class="post-item" href="post.html?slug=${encodeURIComponent(post.slug)}">
+            <span class="post-date">${post.date}</span>
+            <span class="post-title">${title}</span>
+            <span class="post-cat ${catClass}">${t(catKey)}</span>
+          </a>`;
+      }).join('');
+    }
+
+    function onLangChange() { renderPosts(); }
+    initLang();
+    renderPosts();
+
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.toggle('open');
     });
   </script>
 </body>
