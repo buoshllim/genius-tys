@@ -137,27 +137,38 @@
       <!-- Edit form -->
       <div id="edit-form" style="display:none;">
         <div class="modal-title">✏️ 글 수정</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>제목 (한국어)</label>
-            <input type="text" id="title-ko" />
-          </div>
-          <div class="form-group">
-            <label>제목 (영어)</label>
-            <input type="text" id="title-en" />
-          </div>
-        </div>
+
         <div class="form-group">
           <label>종류</label>
-          <select id="category">
-            <option value="record">기록</option>
-            <option value="plan">계획 & 목표</option>
-          </select>
+          <div style="display:flex;gap:20px;padding:6px 0;">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;">
+              <input type="radio" name="category" id="cat-record" value="record" checked />
+              <span style="font-size:15px;">기록</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;">
+              <input type="radio" name="category" id="cat-plan" value="plan" />
+              <span style="font-size:15px;">계획 & 목표</span>
+            </label>
+          </div>
         </div>
+
+        <div class="form-group">
+          <label>제목 (한국어)</label>
+          <input type="text" id="title-ko" />
+        </div>
+
         <div class="form-group">
           <label>내용 (한국어)</label>
           <textarea id="content-ko"></textarea>
         </div>
+
+        <hr style="border:none;border-top:1px solid var(--hairline);margin:4px 0 18px;" />
+
+        <div class="form-group">
+          <label>제목 (영어) <span id="title-en-status" style="font-weight:400;letter-spacing:0;color:var(--primary);font-size:11px;"></span></label>
+          <input type="text" id="title-en" placeholder="1.5초 멈추면 자동 번역 돼!" />
+        </div>
+
         <div class="form-group">
           <label>내용 (영어) <span id="en-status" style="font-weight:400;letter-spacing:0;color:var(--primary);font-size:11px;"></span></label>
           <textarea id="content-en" placeholder="1.5초 멈추면 자동 번역 돼!" style="min-height:100px;"></textarea>
@@ -221,8 +232,12 @@
       document.body.style.overflow = '';
       pendingAction = null;
     }
-    document.getElementById('modal-overlay').addEventListener('click', e => {
-      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    let overlayMouseDown = false;
+    const _overlay = document.getElementById('modal-overlay');
+    _overlay.addEventListener('mousedown', e => { overlayMouseDown = e.target === _overlay; });
+    _overlay.addEventListener('mouseup', e => {
+      if (overlayMouseDown && e.target === _overlay) closeModal();
+      overlayMouseDown = false;
     });
 
     function requireAuth(action) {
@@ -262,7 +277,7 @@
     function showEditForm() {
       document.getElementById('title-ko').value = currentPost.title_ko || '';
       document.getElementById('title-en').value = currentPost.title_en || '';
-      document.getElementById('category').value = currentPost.category;
+      document.getElementById('cat-' + (currentPost.category || 'record')).checked = true;
       document.getElementById('content-ko').value = currentPost.content_ko || '';
       document.getElementById('content-en').value = currentPost.content_en || '';
       document.getElementById('edit-form').style.display = 'block';
@@ -272,7 +287,7 @@
     async function saveEdit() {
       const titleKo = document.getElementById('title-ko').value.trim();
       const titleEn = document.getElementById('title-en').value.trim();
-      const category = document.getElementById('category').value;
+      const category = document.querySelector('input[name="category"]:checked').value;
       const contentKo = document.getElementById('content-ko').value.trim();
       const contentEn = document.getElementById('content-en').value.trim();
       const pw = sessionStorage.getItem(PW_KEY);
@@ -324,42 +339,60 @@
     const MD_HINT = "# 큰 제목\n## 소제목\n\n**굵게** *기울이기* ~~취소선~~\n\n- 목록 1\n- 목록 2\n\n1. 순서 있는 목록\n\n`코드`";
     document.getElementById('content-ko').placeholder = MD_HINT;
 
-    // Auto-translate (markdown-safe)
-    function protectMd(text) {
-      const store = [];
-      const ph = s => { store.push(s); return `|MD${store.length-1}|`; };
-      const r = text
-        .replace(/`[^`\n]+`/g, ph)
-        .replace(/\*\*[^*\n]+\*\*/g, ph)
-        .replace(/~~[^~\n]+~~/g, ph)
-        .replace(/\*[^*\n]+\*/g, ph)
-        .replace(/^#{1,6} /gm, ph)
-        .replace(/^[-*+] /gm, ph)
-        .replace(/^\d+\. /gm, ph)
-        .replace(/^> /gm, ph);
-      return { r, store };
-    }
-    function restoreMd(text, store) {
-      return text.replace(/\|MD(\d+)\|/g, (_, i) => store[i] ?? '');
-    }
-
-    let translateTimer = null;
-    async function autoTranslate(text) {
-      if (!text.trim()) { document.getElementById('content-en').value = ''; return; }
-      document.getElementById('en-status').textContent = '번역 중...';
+    // Auto-translate (line-by-line, markdown-safe)
+    async function translateBatch(text, statusEl) {
+      if (!text.trim()) return '';
+      if (statusEl) statusEl.textContent = '번역 중...';
       try {
-        const { r, store } = protectMd(text);
-        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(r)}&langpair=ko|en`);
+        const lines = text.split('\n');
+        const entries = [];
+        for (const line of lines) {
+          if (!line.trim()) { entries.push(null); continue; }
+          const bm = line.match(/^(#{1,6} |[-*+] |\d+\. |> )(.*)/);
+          const prefix = bm ? bm[1] : '';
+          const raw = bm ? bm[2] : line;
+          const store = [];
+          const ph = s => { store.push(s); return `{{${store.length - 1}}}`; };
+          const r = raw
+            .replace(/`[^`\n]+`/g, ph)
+            .replace(/\*\*[^*\n]+\*\*/g, ph)
+            .replace(/~~[^~\n]+~~/g, ph)
+            .replace(/\*[^*\n]+\*/g, ph);
+          entries.push({ prefix, r, store });
+        }
+        const nonNull = entries.filter(Boolean);
+        if (!nonNull.length) return '';
+        const batch = nonNull.map(e => e.r).join(' ||| ');
+        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(batch)}&langpair=ko|en`);
         const data = await res.json();
         if (data.responseStatus === 200) {
-          document.getElementById('content-en').value = restoreMd(data.responseData.translatedText, store);
+          const parts = data.responseData.translatedText.split(/\s*\|\|\|\s*/);
+          let j = 0;
+          return entries.map(e => {
+            if (!e) return '';
+            const translated = parts[j] !== undefined ? parts[j++] : (j++, e.r);
+            return e.prefix + translated.replace(/\{\{\s*(\d+)\s*\}\}/g, (_, i) => e.store[+i] ?? '');
+          }).join('\n');
         }
       } catch(e) {}
-      document.getElementById('en-status').textContent = '';
+      finally { if (statusEl) statusEl.textContent = ''; }
+      return '';
     }
+
+    let titleTranslateTimer = null, contentTranslateTimer = null;
+    document.getElementById('title-ko').addEventListener('input', () => {
+      clearTimeout(titleTranslateTimer);
+      titleTranslateTimer = setTimeout(async () => {
+        const result = await translateBatch(document.getElementById('title-ko').value, document.getElementById('title-en-status'));
+        if (result) document.getElementById('title-en').value = result;
+      }, 1500);
+    });
     document.getElementById('content-ko').addEventListener('input', () => {
-      clearTimeout(translateTimer);
-      translateTimer = setTimeout(() => autoTranslate(document.getElementById('content-ko').value), 1500);
+      clearTimeout(contentTranslateTimer);
+      contentTranslateTimer = setTimeout(async () => {
+        const result = await translateBatch(document.getElementById('content-ko').value, document.getElementById('en-status'));
+        document.getElementById('content-en').value = result;
+      }, 1500);
     });
 
     function onLangChange() { if (currentPost) renderPost(); }
