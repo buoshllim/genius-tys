@@ -5,6 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Post — GENIUS TY.S.</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .post-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .icon-btn {
+      background: none;
+      border: 1px solid var(--hairline);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: var(--font);
+      color: var(--ink-muted-80);
+    }
+    .icon-btn:hover { background: var(--canvas-parchment); }
+    .icon-btn.del:hover { border-color: #ff3b30; color: #ff3b30; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      z-index: 150;
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: var(--canvas);
+      width: 100%; max-width: 680px;
+      max-height: 92vh; overflow-y: auto;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 28px 48px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+    .modal-handle { width: 36px; height: 4px; background: var(--hairline); border-radius: 2px; margin: 0 auto 24px; }
+    .modal-title { font-size: 21px; font-weight: 600; margin-bottom: 24px; letter-spacing: -0.374px; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-muted-48); margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; background: var(--canvas-parchment); border: 1px solid var(--hairline);
+      border-radius: 8px; padding: 11px 14px; font-family: var(--font); font-size: 16px;
+      color: var(--ink); outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+    .form-group textarea { min-height: 200px; resize: vertical; line-height: 1.6; }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+    .status-msg { margin-top: 10px; padding: 10px 14px; border-radius: 8px; font-size: 13px; display: none; }
+    .status-ok  { background: rgba(52,199,89,0.1); color: #1a7a32; }
+    .status-err { background: rgba(255,59,48,0.1); color: #c0392b; }
+
+    /* Password screen */
+    .pw-screen { text-align: center; padding: 20px 0; }
+    .pw-screen h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .pw-screen p  { font-size: 14px; color: var(--ink-muted-80); margin-bottom: 20px; }
+    .pw-screen input {
+      width: 100%; background: var(--canvas-parchment); border: 1px solid var(--hairline);
+      border-radius: 8px; padding: 12px; font-family: var(--font); font-size: 20px;
+      text-align: center; letter-spacing: 6px; outline: none; margin-bottom: 12px;
+    }
+    .pw-screen input:focus { border-color: var(--primary); }
+    .pw-error { color: #c0392b; font-size: 13px; margin-top: 6px; display: none; }
+  </style>
 </head>
 <body>
 
@@ -34,41 +107,221 @@
 
   <main style="padding-top:44px;">
     <div class="post-content">
-      <a href="records.html" class="caption" style="color:var(--ink-muted-48);text-decoration:none;display:block;margin-bottom:32px;" data-i18n="back">← Back</a>
+      <div class="post-actions">
+        <a href="records.html" class="caption" style="color:var(--ink-muted-48);text-decoration:none;" data-i18n="back">← Back</a>
+        <div id="admin-btns" style="display:none; gap:8px; display:none;">
+          <button class="icon-btn" onclick="openEditModal()">✏️ 수정</button>
+          <button class="icon-btn del" onclick="deletePost()">🗑 삭제</button>
+        </div>
+      </div>
       <div id="post-body"><p style="color:var(--ink-muted-48);">불러오는 중...</p></div>
     </div>
   </main>
 
   <footer><p data-i18n="footer">© GENIUS TY.S. All rights reserved.</p></footer>
 
+  <!-- Edit modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-handle"></div>
+
+      <!-- Password screen -->
+      <div id="pw-screen" class="pw-screen" style="display:none;">
+        <h3>🔒 비밀번호</h3>
+        <p>GENIUS TY.S.만 들어올 수 있어!</p>
+        <input type="password" id="pw-input" placeholder="••••••" onkeydown="if(event.key==='Enter')checkPw()" />
+        <button class="btn-primary" style="width:100%;padding:12px;" onclick="checkPw()">입장!</button>
+        <p class="pw-error" id="pw-error">❌ 비밀번호가 틀렸어!</p>
+      </div>
+
+      <!-- Edit form -->
+      <div id="edit-form" style="display:none;">
+        <div class="modal-title">✏️ 글 수정</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>제목 (한국어)</label>
+            <input type="text" id="title-ko" />
+          </div>
+          <div class="form-group">
+            <label>제목 (영어)</label>
+            <input type="text" id="title-en" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>종류</label>
+          <select id="category">
+            <option value="record">기록</option>
+            <option value="plan">계획 & 목표</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>내용 (한국어)</label>
+          <textarea id="content-ko"></textarea>
+        </div>
+        <div class="form-group">
+          <label>내용 (영어) — 선택</label>
+          <textarea id="content-en" style="min-height:100px;"></textarea>
+        </div>
+        <div style="display:flex;gap:12px;">
+          <button class="btn-primary" id="save-btn" onclick="saveEdit()" style="flex:1;padding:12px;border:none;cursor:pointer;">✅ 저장</button>
+          <button class="btn-secondary" onclick="closeModal()" style="padding:12px 20px;cursor:pointer;">취소</button>
+        </div>
+        <div class="status-msg" id="status-msg"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/db.js"></script>
   <script>
+    const SESSION_KEY = 'geniustys_auth';
+    const PW_KEY = 'geniustys_pw';
     const slug = new URLSearchParams(location.search).get('slug');
+    let currentPost = null;
+    let pendingAction = null; // 'edit' | 'delete'
 
     async function loadPost() {
       if (!slug) { document.getElementById('post-body').innerHTML = '<p>글을 찾을 수 없어.</p>'; return; }
-      const post = await dbFetchPost(slug);
-      if (!post) { document.getElementById('post-body').innerHTML = '<p>글을 찾을 수 없어.</p>'; return; }
+      currentPost = await dbFetchPost(slug);
+      if (!currentPost) { document.getElementById('post-body').innerHTML = '<p>글을 찾을 수 없어.</p>'; return; }
+      renderPost();
+      // Show admin buttons if already authenticated
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        document.getElementById('admin-btns').style.display = 'flex';
+      }
+    }
 
-      const title = currentLang === 'ko' ? post.title_ko : post.title_en;
-      const content = currentLang === 'ko' ? post.content_ko : (post.content_en || post.content_ko);
-      const catKey = post.category === 'record' ? 'cat_record' : 'cat_plan';
-      const catClass = post.category === 'record' ? 'cat-record' : 'cat-plan';
-
+    function renderPost() {
+      const title = currentLang === 'ko' ? currentPost.title_ko : currentPost.title_en;
+      const content = currentLang === 'ko' ? currentPost.content_ko : (currentPost.content_en || currentPost.content_ko);
+      const catKey = currentPost.category === 'record' ? 'cat_record' : 'cat_plan';
+      const catClass = currentPost.category === 'record' ? 'cat-record' : 'cat-plan';
       document.title = `${title} — GENIUS TY.S.`;
       document.getElementById('post-body').innerHTML = `
         <h1>${title}</h1>
         <div class="post-meta">
-          <span>${post.date}</span>
+          <span>${currentPost.date}</span>
           <span class="post-cat ${catClass}" style="font-size:11px;">${t(catKey)}</span>
         </div>
         <div>${marked.parse(content)}</div>
       `;
     }
 
-    function onLangChange() { loadPost(); }
+    // Modal
+    function openModal() {
+      document.getElementById('modal-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+      pendingAction = null;
+    }
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    function requireAuth(action) {
+      pendingAction = action;
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        runPendingAction();
+      } else {
+        document.getElementById('pw-screen').style.display = 'block';
+        document.getElementById('edit-form').style.display = 'none';
+        openModal();
+      }
+    }
+
+    async function checkPw() {
+      const val = document.getElementById('pw-input').value;
+      const res = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: val, action: 'check' })
+      });
+      if (res.status === 401) {
+        document.getElementById('pw-error').style.display = 'block';
+      } else {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        sessionStorage.setItem(PW_KEY, val);
+        document.getElementById('admin-btns').style.display = 'flex';
+        document.getElementById('pw-screen').style.display = 'none';
+        runPendingAction();
+      }
+    }
+
+    function runPendingAction() {
+      if (pendingAction === 'edit') showEditForm();
+      if (pendingAction === 'delete') confirmDelete();
+      pendingAction = null;
+    }
+
+    function openEditModal() { requireAuth('edit'); }
+
+    function showEditForm() {
+      document.getElementById('title-ko').value = currentPost.title_ko || '';
+      document.getElementById('title-en').value = currentPost.title_en || '';
+      document.getElementById('category').value = currentPost.category;
+      document.getElementById('content-ko').value = currentPost.content_ko || '';
+      document.getElementById('content-en').value = currentPost.content_en || '';
+      document.getElementById('edit-form').style.display = 'block';
+      openModal();
+    }
+
+    async function saveEdit() {
+      const titleKo = document.getElementById('title-ko').value.trim();
+      const titleEn = document.getElementById('title-en').value.trim();
+      const category = document.getElementById('category').value;
+      const contentKo = document.getElementById('content-ko').value.trim();
+      const contentEn = document.getElementById('content-en').value.trim();
+      const pw = sessionStorage.getItem(PW_KEY);
+
+      if (!titleKo || !contentKo) { showStatus('제목이랑 내용을 입력해줘!', false); return; }
+
+      const btn = document.getElementById('save-btn');
+      btn.textContent = '저장 중...'; btn.disabled = true;
+
+      const res = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw, action: 'update', slug, title_ko: titleKo, title_en: titleEn, category, content_ko: contentKo, content_en: contentEn })
+      });
+
+      const data = await res.json();
+      if (!res.ok) { showStatus(`오류: ${data.error}`, false); }
+      else {
+        currentPost = { ...currentPost, title_ko: titleKo, title_en: titleEn, category, content_ko: contentKo, content_en: contentEn };
+        renderPost();
+        showStatus('✅ 수정했어!', true);
+        setTimeout(closeModal, 1200);
+      }
+      btn.textContent = '✅ 저장'; btn.disabled = false;
+    }
+
+    function deletePost() { requireAuth('delete'); }
+
+    async function confirmDelete() {
+      if (!confirm(`"${currentPost.title_ko}" 삭제할까?`)) return;
+      const pw = sessionStorage.getItem(PW_KEY);
+      const res = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw, action: 'delete', slug })
+      });
+      if (res.ok) {
+        alert('삭제했어!');
+        location.href = 'records.html';
+      }
+    }
+
+    function showStatus(msg, ok) {
+      const el = document.getElementById('status-msg');
+      el.textContent = msg; el.className = `status-msg ${ok ? 'status-ok' : 'status-err'}`;
+      el.style.display = 'block';
+    }
+
+    function onLangChange() { if (currentPost) renderPost(); }
     initLang();
     loadPost();
 
