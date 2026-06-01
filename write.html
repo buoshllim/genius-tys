@@ -57,9 +57,7 @@
       display: flex;
       gap: 16px;
     }
-    .form-row .form-group {
-      flex: 1;
-    }
+    .form-row .form-group { flex: 1; }
     .publish-btn {
       width: 100%;
       padding: 14px;
@@ -75,11 +73,11 @@
       font-size: 14px;
       display: none;
     }
-    .status-ok { background: rgba(52,199,89,0.1); color: #1a7a32; }
-    .status-err { background: rgba(255,59,48,0.1); color: #c0392b; }
+    .status-ok  { background: rgba(52,199,89,0.1);  color: #1a7a32; }
+    .status-err { background: rgba(255,59,48,0.1);  color: #c0392b; }
 
-    /* Setup overlay */
-    .setup-overlay {
+    /* Password overlay */
+    .pw-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.6);
@@ -90,50 +88,43 @@
       justify-content: center;
       padding: 24px;
     }
-    .setup-box {
+    .pw-box {
       background: var(--canvas);
       border-radius: 18px;
       padding: 36px;
-      max-width: 440px;
+      max-width: 360px;
       width: 100%;
+      text-align: center;
     }
-    .setup-box h2 {
-      font-size: 21px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .setup-box p {
-      font-size: 14px;
-      color: var(--ink-muted-80);
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .setup-box input {
+    .pw-box h2 { font-size: 21px; font-weight: 600; margin-bottom: 8px; }
+    .pw-box p  { font-size: 14px; color: var(--ink-muted-80); margin-bottom: 24px; }
+    .pw-box input {
       width: 100%;
       background: var(--canvas-parchment);
       border: 1px solid var(--hairline);
       border-radius: 8px;
       padding: 12px 16px;
       font-family: var(--font);
-      font-size: 14px;
-      color: var(--ink);
+      font-size: 17px;
+      text-align: center;
+      letter-spacing: 4px;
       outline: none;
       margin-bottom: 12px;
     }
-    .setup-box input:focus { border-color: var(--primary); }
+    .pw-box input:focus { border-color: var(--primary); }
+    .pw-error { color: #c0392b; font-size: 13px; margin-top: 8px; display: none; }
   </style>
 </head>
 <body>
 
-  <!-- Setup overlay (shown on first visit) -->
-  <div class="setup-overlay" id="setup-overlay">
-    <div class="setup-box">
-      <h2>🔑 처음 설정</h2>
-      <p>GitHub 토큰이랑 정보를 입력해. 한 번만 하면 돼 — 브라우저가 기억해!</p>
-      <input type="password" id="setup-token" placeholder="GitHub Personal Access Token" />
-      <input type="text" id="setup-owner" placeholder="GitHub 유저명 (예: buoshllim)" />
-      <input type="text" id="setup-repo" placeholder="레포 이름 (예: genius-tys)" />
-      <button class="btn-primary publish-btn" onclick="saveSetup()">저장하고 시작!</button>
+  <!-- Password overlay -->
+  <div class="pw-overlay" id="pw-overlay">
+    <div class="pw-box">
+      <h2>🔒 비밀번호</h2>
+      <p>GENIUS TY.S.만 들어올 수 있어!</p>
+      <input type="password" id="pw-input" placeholder="••••••" onkeydown="if(event.key==='Enter')checkPw()" />
+      <button class="btn-primary" style="width:100%;padding:12px;" onclick="checkPw()">입장!</button>
+      <p class="pw-error" id="pw-error">❌ 비밀번호가 틀렸어!</p>
     </div>
   </div>
 
@@ -145,9 +136,6 @@
       <li><a href="games.html">Games & Apps</a></li>
       <li><a href="records.html" class="active">Records & Plans</a></li>
     </ul>
-    <div class="nav-right">
-      <button class="lang-btn" style="color:rgba(255,255,255,0.5);font-size:11px;" onclick="clearSetup()">설정 초기화</button>
-    </div>
   </nav>
 
   <main style="padding-top: 44px;">
@@ -179,54 +167,42 @@
       </div>
 
       <button class="btn-primary publish-btn" id="publish-btn" onclick="publish()">🚀 올리기</button>
-
       <div class="status-msg" id="status-msg"></div>
     </div>
   </main>
 
   <script>
-    const OWNER_KEY = 'geniustys_owner';
-    const REPO_KEY = 'geniustys_repo';
-    const TOKEN_KEY = 'geniustys_token';
+    const SESSION_KEY = 'geniustys_auth';
 
-    function checkSetup() {
-      const token = localStorage.getItem(TOKEN_KEY);
-      const owner = localStorage.getItem(OWNER_KEY);
-      const repo = localStorage.getItem(REPO_KEY);
-      if (token && owner && repo) {
-        document.getElementById('setup-overlay').style.display = 'none';
-      } else {
-        // Pre-fill defaults
-        document.getElementById('setup-owner').value = 'buoshllim';
-        document.getElementById('setup-repo').value = 'genius-tys';
-      }
+    // Check if already authenticated this session
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+      document.getElementById('pw-overlay').style.display = 'none';
     }
 
-    function saveSetup() {
-      const token = document.getElementById('setup-token').value.trim();
-      const owner = document.getElementById('setup-owner').value.trim();
-      const repo = document.getElementById('setup-repo').value.trim();
-      if (!token || !owner || !repo) { alert('모두 입력해줘!'); return; }
-      localStorage.setItem(TOKEN_KEY, token);
-      localStorage.setItem(OWNER_KEY, owner);
-      localStorage.setItem(REPO_KEY, repo);
-      document.getElementById('setup-overlay').style.display = 'none';
-    }
-
-    function clearSetup() {
-      if (confirm('설정을 초기화할까요?')) {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(OWNER_KEY);
-        localStorage.removeItem(REPO_KEY);
-        location.reload();
-      }
+    function checkPw() {
+      const val = document.getElementById('pw-input').value;
+      // Send a test request to verify password
+      fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: val, _check: true, slug: '_check', titleKo: '_check', content: '_check', date: '_check', category: 'record' })
+      }).then(r => {
+        if (r.status === 401) {
+          document.getElementById('pw-error').style.display = 'block';
+        } else {
+          sessionStorage.setItem(SESSION_KEY, '1');
+          sessionStorage.setItem('geniustys_pw', val);
+          document.getElementById('pw-overlay').style.display = 'none';
+        }
+      });
     }
 
     function slugify(text) {
-      return text.toLowerCase()
-        .replace(/[^a-z0-9가-힣\s-]/g, '')
+      return text
+        .replace(/[^a-z0-9가-힣\s]/gi, '')
         .trim()
         .replace(/\s+/g, '-')
+        .toLowerCase()
         .substring(0, 50);
     }
 
@@ -238,40 +214,14 @@
       return { iso: `${y}-${m}-${dd}`, display: `${y}.${m}.${dd}` };
     }
 
-    async function githubGet(path) {
-      const token = localStorage.getItem(TOKEN_KEY);
-      const owner = localStorage.getItem(OWNER_KEY);
-      const repo = localStorage.getItem(REPO_KEY);
-      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }
-      });
-      return res.ok ? res.json() : null;
-    }
-
-    async function githubPut(path, content, message, sha) {
-      const token = localStorage.getItem(TOKEN_KEY);
-      const owner = localStorage.getItem(OWNER_KEY);
-      const repo = localStorage.getItem(REPO_KEY);
-      const body = { message, content: btoa(unescape(encodeURIComponent(content))) };
-      if (sha) body.sha = sha;
-      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      return res.ok;
-    }
-
     async function publish() {
       const titleKo = document.getElementById('title-ko').value.trim();
       const titleEn = document.getElementById('title-en').value.trim();
       const category = document.getElementById('category').value;
       const content = document.getElementById('content').value.trim();
+      const password = sessionStorage.getItem('geniustys_pw');
 
-      if (!titleKo || !content) {
-        showStatus('제목이랑 내용을 입력해줘!', false);
-        return;
-      }
+      if (!titleKo || !content) { showStatus('제목이랑 내용을 입력해줘!', false); return; }
 
       const btn = document.getElementById('publish-btn');
       btn.textContent = '올리는 중...';
@@ -281,47 +231,20 @@
       const slug = `${iso}-${slugify(titleKo)}`;
 
       try {
-        // 1. Upload .ko.md
-        const koOk = await githubPut(
-          `posts/${slug}.ko.md`,
-          content,
-          `post: ${titleKo}`
-        );
-        if (!koOk) throw new Error('글 파일 업로드 실패');
+        const res = await fetch('/api/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, slug, titleKo, titleEn, category, content, date: display })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '오류 발생');
 
-        // 2. Upload .en.md if English title provided
-        if (titleEn) {
-          await githubPut(`posts/${slug}.en.md`, content, `post(en): ${titleEn}`);
-        }
-
-        // 3. Update posts/index.json
-        const existing = await githubGet('posts/index.json');
-        let posts = [];
-        if (existing) {
-          posts = JSON.parse(decodeURIComponent(escape(atob(existing.content.replace(/\n/g,'')))));
-        }
-        const newPost = {
-          slug,
-          date: display,
-          title_ko: titleKo,
-          title_en: titleEn || titleKo,
-          category
-        };
-        posts.unshift(newPost);
-        const indexOk = await githubPut(
-          'posts/index.json',
-          JSON.stringify(posts, null, 2),
-          `index: add ${titleKo}`,
-          existing ? existing.sha : undefined
-        );
-        if (!indexOk) throw new Error('목록 업데이트 실패');
-
-        showStatus('🎉 올렸어! Vercel이 배포하는 데 1~2분 걸려.', true);
+        showStatus('🎉 올렸어! 1~2분 후에 사이트에 나타나!', true);
         document.getElementById('title-ko').value = '';
         document.getElementById('title-en').value = '';
         document.getElementById('content').value = '';
       } catch (e) {
-        showStatus(`오류 났어: ${e.message}`, false);
+        showStatus(`오류: ${e.message}`, false);
       }
 
       btn.textContent = '🚀 올리기';
@@ -334,8 +257,6 @@
       el.className = `status-msg ${ok ? 'status-ok' : 'status-err'}`;
       el.style.display = 'block';
     }
-
-    checkSetup();
   </script>
 </body>
 </html>
