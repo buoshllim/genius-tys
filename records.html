@@ -316,7 +316,8 @@
     function today() {
       const d = new Date();
       const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0');
-      return { iso:`${y}-${m}-${dd}`, display:`${y}.${m}.${dd}` };
+      const hh = String(d.getHours()).padStart(2,'0'), mi = String(d.getMinutes()).padStart(2,'0');
+      return { iso:`${y}-${m}-${dd}`, display:`${y}.${m}.${dd} ${hh}:${mi}` };
     }
 
     async function submitPost() {
