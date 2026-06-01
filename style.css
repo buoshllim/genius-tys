@@ -463,6 +463,7 @@ main {
 .post-content h3 { font-size: 21px; font-weight: 600; margin: 32px 0 12px; }
 .post-content ul, .post-content ol { padding-left: 24px; margin-bottom: 20px; }
 .post-content li { margin-bottom: 8px; }
+.post-content blockquote { border-left: 3px solid var(--hairline); margin: 20px 0; padding: 4px 20px; color: var(--ink-muted-80); }
 .post-content code { background: var(--canvas-parchment); padding: 2px 6px; border-radius: 4px; font-size: 14px; }
 .post-content pre { background: var(--tile-1); color: var(--body-on-dark); padding: 20px; border-radius: 12px; overflow-x: auto; margin-bottom: 20px; }
 .post-content pre code { background: none; padding: 0; color: inherit; }
