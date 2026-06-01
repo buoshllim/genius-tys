@@ -109,7 +109,7 @@
     <div class="post-content">
       <div class="post-actions">
         <a href="records.html" class="caption" style="color:var(--ink-muted-48);text-decoration:none;" data-i18n="back">← Back</a>
-        <div id="admin-btns" style="display:none; gap:8px; display:none;">
+        <div id="admin-btns" style="display:flex; gap:8px;">
           <button class="icon-btn" onclick="openEditModal()">✏️ 수정</button>
           <button class="icon-btn del" onclick="deletePost()">🗑 삭제</button>
         </div>
@@ -186,10 +186,6 @@
       currentPost = await dbFetchPost(slug);
       if (!currentPost) { document.getElementById('post-body').innerHTML = '<p>글을 찾을 수 없어.</p>'; return; }
       renderPost();
-      // Show admin buttons if already authenticated
-      if (sessionStorage.getItem(SESSION_KEY) === '1') {
-        document.getElementById('admin-btns').style.display = 'flex';
-      }
     }
 
     function renderPost() {
@@ -245,7 +241,6 @@
       } else {
         sessionStorage.setItem(SESSION_KEY, '1');
         sessionStorage.setItem(PW_KEY, val);
-        document.getElementById('admin-btns').style.display = 'flex';
         document.getElementById('pw-screen').style.display = 'none';
         runPendingAction();
       }
