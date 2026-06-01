@@ -5,6 +5,104 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Records & Plans — GENIUS TY.S.</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Floating write button */
+    .fab {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s, background 0.15s;
+      z-index: 50;
+    }
+    .fab:hover { background: var(--primary); transform: scale(1.08); }
+    .fab:active { transform: scale(0.95); }
+
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      z-index: 150;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-box {
+      background: var(--canvas);
+      width: 100%;
+      max-width: 680px;
+      max-height: 92vh;
+      overflow-y: auto;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 28px 48px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    }
+    .modal-overlay.open .modal-box {
+      transform: translateY(0);
+    }
+    .modal-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--hairline);
+      border-radius: 2px;
+      margin: 0 auto 24px;
+    }
+    .modal-title {
+      font-size: 21px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: -0.374px;
+    }
+
+    /* Form */
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-muted-48); margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; background: var(--canvas-parchment); border: 1px solid var(--hairline);
+      border-radius: 8px; padding: 11px 14px; font-family: var(--font); font-size: 16px;
+      color: var(--ink); outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+    .form-group textarea { min-height: 200px; resize: vertical; line-height: 1.6; }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+    .status-msg { margin-top: 10px; padding: 10px 14px; border-radius: 8px; font-size: 13px; display: none; }
+    .status-ok  { background: rgba(52,199,89,0.1);  color: #1a7a32; }
+    .status-err { background: rgba(255,59,48,0.1);  color: #c0392b; }
+
+    /* Password screen inside modal */
+    .pw-screen { text-align: center; padding: 20px 0; }
+    .pw-screen h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .pw-screen p  { font-size: 14px; color: var(--ink-muted-80); margin-bottom: 20px; }
+    .pw-screen input {
+      width: 100%; background: var(--canvas-parchment); border: 1px solid var(--hairline);
+      border-radius: 8px; padding: 12px; font-family: var(--font); font-size: 20px;
+      text-align: center; letter-spacing: 6px; outline: none; margin-bottom: 12px;
+    }
+    .pw-screen input:focus { border-color: var(--primary); }
+    .pw-error { color: #c0392b; font-size: 13px; margin-top: 6px; display: none; }
+  </style>
 </head>
 <body>
 
@@ -44,18 +142,79 @@
 
   <footer><p data-i18n="footer">© GENIUS TY.S. All rights reserved.</p></footer>
 
+  <!-- Floating write button -->
+  <button class="fab" id="fab" title="글 쓰기">✏️</button>
+
+  <!-- Write modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-handle"></div>
+
+      <!-- Password screen -->
+      <div id="pw-screen" class="pw-screen" style="display:none;">
+        <h3>🔒 비밀번호</h3>
+        <p>GENIUS TY.S.만 들어올 수 있어!</p>
+        <input type="password" id="pw-input" placeholder="••••••" onkeydown="if(event.key==='Enter')checkPw()" />
+        <button class="btn-primary" style="width:100%;padding:12px;" onclick="checkPw()">입장!</button>
+        <p class="pw-error" id="pw-error">❌ 비밀번호가 틀렸어!</p>
+      </div>
+
+      <!-- Write form -->
+      <div id="write-form" style="display:none;">
+        <div class="modal-title">✏️ 새 글 쓰기</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>제목 (한국어)</label>
+            <input type="text" id="title-ko" placeholder="글 제목" />
+          </div>
+          <div class="form-group">
+            <label>제목 (영어) — 선택</label>
+            <input type="text" id="title-en" placeholder="English title" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>종류</label>
+          <select id="category">
+            <option value="record">기록</option>
+            <option value="plan">계획 & 목표</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>내용 (한국어)</label>
+          <textarea id="content-ko" placeholder="여기에 글을 써봐! 마크다운도 돼."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>내용 (영어) — 선택</label>
+          <textarea id="content-en" placeholder="English content (optional)" style="min-height:100px;"></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;">
+          <button class="btn-primary" id="submit-btn" onclick="submitPost()" style="flex:1;padding:12px;border:none;cursor:pointer;">🚀 올리기</button>
+          <button class="btn-secondary" onclick="closeModal()" style="padding:12px 20px;cursor:pointer;">닫기</button>
+        </div>
+        <div class="status-msg" id="status-msg"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/i18n.js"></script>
   <script src="js/db.js"></script>
   <script>
+    const SESSION_KEY = 'geniustys_auth';
+    const PW_KEY = 'geniustys_pw';
+
+    // Post list
     async function renderPosts() {
       const el = document.getElementById('post-list');
       const posts = await dbFetchPosts();
-
       if (!posts.length) {
         el.innerHTML = `<p style="color:var(--ink-muted-48);padding:40px 0;">${t('records_empty')}</p>`;
         return;
       }
-
       el.innerHTML = posts.map(post => {
         const title = currentLang === 'ko' ? post.title_ko : post.title_en;
         const catKey = post.category === 'record' ? 'cat_record' : 'cat_plan';
@@ -68,6 +227,104 @@
           </a>`;
       }).join('');
     }
+
+    // Modal
+    function openModal() {
+      document.getElementById('modal-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        document.getElementById('pw-screen').style.display = 'none';
+        document.getElementById('write-form').style.display = 'block';
+      } else {
+        document.getElementById('pw-screen').style.display = 'block';
+        document.getElementById('write-form').style.display = 'none';
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close on overlay click
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    // Password
+    async function checkPw() {
+      const val = document.getElementById('pw-input').value;
+      const res = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: val, action: 'check' })
+      });
+      if (res.status === 401) {
+        document.getElementById('pw-error').style.display = 'block';
+      } else {
+        sessionStorage.setItem(SESSION_KEY, '1');
+        sessionStorage.setItem(PW_KEY, val);
+        document.getElementById('pw-screen').style.display = 'none';
+        document.getElementById('write-form').style.display = 'block';
+      }
+    }
+
+    // Submit
+    function slugify(text) {
+      return text.replace(/[^a-z0-9가-힣\s]/gi,'').trim().replace(/\s+/g,'-').toLowerCase().substring(0,50);
+    }
+
+    function today() {
+      const d = new Date();
+      const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0');
+      return { iso:`${y}-${m}-${dd}`, display:`${y}.${m}.${dd}` };
+    }
+
+    async function submitPost() {
+      const titleKo = document.getElementById('title-ko').value.trim();
+      const titleEn = document.getElementById('title-en').value.trim();
+      const category = document.getElementById('category').value;
+      const contentKo = document.getElementById('content-ko').value.trim();
+      const contentEn = document.getElementById('content-en').value.trim();
+      const pw = sessionStorage.getItem(PW_KEY);
+
+      if (!titleKo || !contentKo) { showStatus('제목이랑 내용을 입력해줘!', false); return; }
+
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = '저장 중...'; btn.disabled = true;
+
+      const { iso, display } = today();
+      const slug = `${iso}-${slugify(titleKo)}`;
+
+      const res = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw, action: 'create', slug, title_ko: titleKo, title_en: titleEn, category, content_ko: contentKo, content_en: contentEn, date: display })
+      });
+
+      const data = await res.json();
+      if (!res.ok) { showStatus(`오류: ${data.error}`, false); }
+      else {
+        showStatus('🎉 올렸어!', true);
+        document.getElementById('title-ko').value = '';
+        document.getElementById('title-en').value = '';
+        document.getElementById('content-ko').value = '';
+        document.getElementById('content-en').value = '';
+        renderPosts();
+        setTimeout(closeModal, 1500);
+      }
+
+      btn.textContent = '🚀 올리기'; btn.disabled = false;
+    }
+
+    function showStatus(msg, ok) {
+      const el = document.getElementById('status-msg');
+      el.textContent = msg; el.className = `status-msg ${ok ? 'status-ok' : 'status-err'}`;
+      el.style.display = 'block';
+    }
+
+    // FAB
+    document.getElementById('fab').addEventListener('click', openModal);
 
     function onLangChange() { renderPosts(); }
     initLang();
