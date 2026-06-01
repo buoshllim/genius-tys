@@ -166,12 +166,12 @@
 
         <div class="form-group">
           <label>제목 (영어) <span id="title-en-status" style="font-weight:400;letter-spacing:0;color:var(--primary);font-size:11px;"></span></label>
-          <input type="text" id="title-en" placeholder="1.5초 멈추면 자동 번역 돼!" />
+          <input type="text" id="title-en" placeholder="1초 멈추면 자동 번역 돼!" />
         </div>
 
         <div class="form-group">
           <label>내용 (영어) <span id="en-status" style="font-weight:400;letter-spacing:0;color:var(--primary);font-size:11px;"></span></label>
-          <textarea id="content-en" placeholder="1.5초 멈추면 자동 번역 돼!" style="min-height:200px;"></textarea>
+          <textarea id="content-en" placeholder="1초 멈추면 자동 번역 돼!" style="min-height:200px;"></textarea>
         </div>
         <div style="display:flex;gap:12px;">
           <button class="btn-primary" id="save-btn" onclick="saveEdit()" style="flex:1;padding:12px;border:none;cursor:pointer;">✅ 저장</button>
@@ -384,14 +384,14 @@
       titleTranslateTimer = setTimeout(async () => {
         const result = await translateBatch(document.getElementById('title-ko').value, document.getElementById('title-en-status'));
         if (result) document.getElementById('title-en').value = result;
-      }, 1500);
+      }, 1000);
     });
     document.getElementById('content-ko').addEventListener('input', () => {
       clearTimeout(contentTranslateTimer);
       contentTranslateTimer = setTimeout(async () => {
         const result = await translateBatch(document.getElementById('content-ko').value, document.getElementById('en-status'));
         document.getElementById('content-en').value = result;
-      }, 1500);
+      }, 1000);
     });
 
     function onLangChange() { if (currentPost) renderPost(); }
