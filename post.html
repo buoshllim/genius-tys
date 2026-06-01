@@ -209,6 +209,13 @@
       document.getElementById('modal-overlay').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
+
+    function openModalWithPw() {
+      document.getElementById('pw-screen').style.display = 'block';
+      document.getElementById('edit-form').style.display = 'none';
+      openModal();
+      setTimeout(() => document.getElementById('pw-input').focus(), 300);
+    }
     function closeModal() {
       document.getElementById('modal-overlay').classList.remove('open');
       document.body.style.overflow = '';
@@ -223,9 +230,7 @@
       if (sessionStorage.getItem(SESSION_KEY) === '1') {
         runPendingAction();
       } else {
-        document.getElementById('pw-screen').style.display = 'block';
-        document.getElementById('edit-form').style.display = 'none';
-        openModal();
+        openModalWithPw();
       }
     }
 
