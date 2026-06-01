@@ -1,5 +1,12 @@
 [
   {
+    "slug": "_check",
+    "date": "_check",
+    "title_ko": "_check",
+    "title_en": "_check",
+    "category": "record"
+  },
+  {
     "slug": "2026-06-01-hello",
     "date": "2026.06.01",
     "title_en": "Hello, World!",
