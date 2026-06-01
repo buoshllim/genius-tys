@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GENIUS TY.S.</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Global Nav -->
+  <nav class="global-nav">
+    <a class="nav-logo" href="index.html">GENIUS TY.S.</a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active" data-i18n="nav_home">Home</a></li>
+      <li><a href="games.html" data-i18n="nav_games">Games & Apps</a></li>
+      <li><a href="records.html" data-i18n="nav_records">Records & Plans</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="lang-btn" data-lang="en">ENG</button>
+        <button class="lang-btn" data-lang="ko">KOR</button>
+      </div>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html" data-i18n="nav_home">Home</a>
+    <a href="games.html" data-i18n="nav_games">Games & Apps</a>
+    <a href="records.html" data-i18n="nav_records">Records & Plans</a>
+  </div>
+
+  <main>
+
+    <!-- Hero tile (light) -->
+    <section class="tile tile-light">
+      <p class="hero-display">GENIUS TY.S.</p>
+      <p class="lead" style="color: var(--ink-muted-80); margin-top: 16px;" data-i18n="hero_sub">I build games & apps.</p>
+    </section>
+
+    <!-- Goal tile (dark) -->
+    <section class="tile tile-dark">
+      <p class="goal-eyebrow" data-i18n="goal_eyebrow">My Final Goal</p>
+      <p class="display-lg" style="max-width: 680px;" data-i18n="goal_text">To build a world-class company that advances science.</p>
+    </section>
+
+    <!-- Featured game tile (parchment) -->
+    <section class="tile tile-parchment">
+      <p class="featured-tag" data-i18n="featured_tag">Featured Game</p>
+      <p class="display-lg" style="margin-bottom: 12px;">Mini Soccer: Chaos Rush</p>
+      <p class="body-text" style="color: var(--ink-muted-80);" data-i18n="featured_desc1">A fast-paced 5v5 browser soccer game.</p>
+      <p class="body-text" style="color: var(--ink-muted-80); margin-top: 4px;" data-i18n="featured_desc2">Jump in and play with your friends right now!</p>
+      <div class="cta-group">
+        <a href="https://buoshllim.itch.io/mini-soccer-chaos-rush" target="_blank" class="btn-primary" data-i18n="featured_cta">LET'S PLAY NOW</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p data-i18n="footer">© GENIUS TY.S. All rights reserved.</p>
+  </footer>
+
+  <script src="js/i18n.js"></script>
+  <script>
+    initLang();
+
+    // Hamburger
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

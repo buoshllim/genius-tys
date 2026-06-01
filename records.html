@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Records & Plans — GENIUS TY.S.</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Global Nav -->
+  <nav class="global-nav">
+    <a class="nav-logo" href="index.html">GENIUS TY.S.</a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+      <li><a href="games.html" data-i18n="nav_games">Games & Apps</a></li>
+      <li><a href="records.html" class="active" data-i18n="nav_records">Records & Plans</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="lang-btn" data-lang="en">ENG</button>
+        <button class="lang-btn" data-lang="ko">KOR</button>
+      </div>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html" data-i18n="nav_home">Home</a>
+    <a href="games.html" data-i18n="nav_games">Games & Apps</a>
+    <a href="records.html" data-i18n="nav_records">Records & Plans</a>
+  </div>
+
+  <main>
+    <section class="tile tile-light">
+      <h1 class="display-lg" data-i18n="records_title">Records & Plans</h1>
+      <p class="body-text" style="color: var(--ink-muted-80); margin-top: 12px;" data-i18n="records_sub">My thoughts, progress, and goals.</p>
+      <div class="post-list" id="post-list" style="margin-top: 48px;"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p data-i18n="footer">© GENIUS TY.S. All rights reserved.</p>
+  </footer>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/posts.js"></script>
+  <script>
+    function onLangChange() {
+      renderPostList(currentLang);
+    }
+    initLang();
+    renderPostList(currentLang);
+
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

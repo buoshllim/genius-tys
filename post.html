@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post — GENIUS TY.S.</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Global Nav -->
+  <nav class="global-nav">
+    <a class="nav-logo" href="index.html">GENIUS TY.S.</a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+      <li><a href="games.html" data-i18n="nav_games">Games & Apps</a></li>
+      <li><a href="records.html" class="active" data-i18n="nav_records">Records & Plans</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="lang-btn" data-lang="en">ENG</button>
+        <button class="lang-btn" data-lang="ko">KOR</button>
+      </div>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html" data-i18n="nav_home">Home</a>
+    <a href="games.html" data-i18n="nav_games">Games & Apps</a>
+    <a href="records.html" data-i18n="nav_records">Records & Plans</a>
+  </div>
+
+  <main style="padding-top: 44px;">
+    <div class="post-content">
+      <a href="records.html" class="caption" style="color:var(--ink-muted-48); text-decoration:none; display:block; margin-bottom:32px;" data-i18n="back">← Back</a>
+      <div id="post-body">
+        <p style="color:var(--ink-muted-48);">Loading...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p data-i18n="footer">© GENIUS TY.S. All rights reserved.</p>
+  </footer>
+
+  <!-- marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/posts.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const slug = params.get('slug');
+    const langParam = params.get('lang');
+    if (langParam) currentLang = langParam;
+
+    initLang();
+
+    async function loadPost() {
+      if (!slug) {
+        document.getElementById('post-body').innerHTML = '<p>Post not found.</p>';
+        return;
+      }
+
+      const post = POST_INDEX.find(p => p.slug === slug);
+      if (!post) {
+        document.getElementById('post-body').innerHTML = '<p>Post not found.</p>';
+        return;
+      }
+
+      const title = currentLang === 'ko' ? post.title_ko : post.title_en;
+      const catKey = post.category === 'record' ? 'cat_record' : 'cat_plan';
+      const catClass = post.category === 'record' ? 'cat-record' : 'cat-plan';
+
+      document.title = `${title} — GENIUS TY.S.`;
+
+      // Try to load the language-specific markdown, fallback to the other
+      const tryLangs = currentLang === 'ko' ? ['ko', 'en'] : ['en', 'ko'];
+      let md = null;
+      for (const lang of tryLangs) {
+        try {
+          const res = await fetch(`posts/${slug}.${lang}.md`);
+          if (res.ok) { md = await res.text(); break; }
+        } catch (e) {}
+      }
+
+      if (!md) {
+        document.getElementById('post-body').innerHTML = '<p>Post content not found.</p>';
+        return;
+      }
+
+      document.getElementById('post-body').innerHTML = `
+        <h1>${title}</h1>
+        <div class="post-meta">
+          <span>${post.date}</span>
+          <span class="post-cat ${catClass}" style="font-size:11px;">${t(catKey)}</span>
+        </div>
+        <div>${marked.parse(md)}</div>
+      `;
+    }
+
+    function onLangChange() {
+      loadPost();
+    }
+
+    loadPost();
+
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+  </script>
+</body>
+</html>
