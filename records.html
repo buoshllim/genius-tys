@@ -137,6 +137,11 @@
       <div class="post-list" id="post-list" style="margin-top:48px;">
         <p style="color:var(--ink-muted-48);padding:40px 0;">불러오는 중...</p>
       </div>
+      <div id="pagination" style="display:none;align-items:center;gap:20px;justify-content:center;margin-top:32px;">
+        <button id="pg-prev" class="btn-secondary" style="padding:8px 20px;font-size:14px;" onclick="goPage(-1)">← 이전</button>
+        <span id="pg-info" style="font-size:14px;color:var(--ink-muted-48);min-width:48px;text-align:center;"></span>
+        <button id="pg-next" class="btn-secondary" style="padding:8px 20px;font-size:14px;" onclick="goPage(1)">다음 →</button>
+      </div>
     </section>
   </main>
 
@@ -207,16 +212,24 @@
     const SESSION_KEY = 'geniustys_auth';
     const PW_KEY = 'geniustys_pw';
 
-    // Post list
-    async function renderPosts() {
+    // Post list with pagination
+    const PAGE_SIZE = 10;
+    let allPosts = [];
+    let currentPage = 1;
+
+    function renderPage() {
       const el = document.getElementById('post-list');
-      const posts = await dbFetchPosts();
-      if (!posts.length) {
+      if (!allPosts.length) {
         el.innerHTML = `<p style="color:var(--ink-muted-48);padding:40px 0;">${t('records_empty')}</p>`;
+        document.getElementById('pagination').style.display = 'none';
         return;
       }
-      el.innerHTML = posts.map(post => {
-        const title = currentLang === 'ko' ? post.title_ko : post.title_en;
+      const totalPages = Math.ceil(allPosts.length / PAGE_SIZE);
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const page = allPosts.slice(start, start + PAGE_SIZE);
+
+      el.innerHTML = page.map(post => {
+        const title = currentLang === 'ko' ? post.title_ko : (post.title_en || post.title_ko);
         const catKey = post.category === 'record' ? 'cat_record' : 'cat_plan';
         const catClass = post.category === 'record' ? 'cat-record' : 'cat-plan';
         return `
@@ -226,6 +239,21 @@
             <span class="post-cat ${catClass}">${t(catKey)}</span>
           </a>`;
       }).join('');
+
+      const pg = document.getElementById('pagination');
+      if (totalPages <= 1) { pg.style.display = 'none'; return; }
+      pg.style.display = 'flex';
+      document.getElementById('pg-prev').disabled = currentPage === 1;
+      document.getElementById('pg-next').disabled = currentPage === totalPages;
+      document.getElementById('pg-info').textContent = `${currentPage} / ${totalPages}`;
+    }
+
+    async function renderPosts() {
+      const el = document.getElementById('post-list');
+      el.innerHTML = `<p style="color:var(--ink-muted-48);padding:40px 0;">불러오는 중...</p>`;
+      allPosts = await dbFetchPosts();
+      currentPage = 1;
+      renderPage();
     }
 
     // Modal
@@ -370,7 +398,14 @@
     // FAB
     document.getElementById('fab').addEventListener('click', openModal);
 
-    function onLangChange() { renderPosts(); }
+    function goPage(dir) {
+      const totalPages = Math.ceil(allPosts.length / PAGE_SIZE);
+      currentPage = Math.max(1, Math.min(totalPages, currentPage + dir));
+      renderPage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function onLangChange() { renderPage(); }
     initLang();
     renderPosts();
 
