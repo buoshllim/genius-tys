@@ -30,7 +30,7 @@ export default async function handler(req) {
       const res = await fetch(`${SB}/rest/v1/tys_posts`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ slug, title_ko, title_en: title_en || title_ko, category, content_ko, content_en: content_en || content_ko, date }),
+        body: JSON.stringify({ slug, title_ko, title_en: title_en || null, category, content_ko, content_en: content_en || null, date }),
       });
       if (!res.ok) {
         const err = await res.text();
@@ -44,7 +44,7 @@ export default async function handler(req) {
       const res = await fetch(`${SB}/rest/v1/tys_posts?slug=eq.${encodeURIComponent(slug)}`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({ title_ko, title_en: title_en || title_ko, category, content_ko, content_en: content_en || content_ko }),
+        body: JSON.stringify({ title_ko, title_en: title_en || null, category, content_ko, content_en: content_en || null }),
       });
       if (!res.ok) return json({ error: await res.text() }, 500);
       return json({ ok: true });
