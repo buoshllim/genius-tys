@@ -172,7 +172,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>marked.use({ breaks: true });</script>
   <script src="js/i18n.js"></script>
   <script src="js/db.js"></script>
   <script>
@@ -201,7 +200,7 @@
           <span>${currentPost.date}</span>
           <span class="post-cat ${catClass}" style="font-size:11px;">${t(catKey)}</span>
         </div>
-        <div>${marked.parse(content)}</div>
+        <div>${marked.parse(content, { breaks: true, gfm: true })}</div>
       `;
     }
 
