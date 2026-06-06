@@ -19,64 +19,44 @@ const W = 800, H = 600;
 canvas.width = W; canvas.height = H;
 
 function resize() {
-  const s = Math.min(window.innerWidth / W, window.innerHeight / H);
-  canvas.style.width = (W*s)+'px';
-  canvas.style.height = (H*s)+'px';
+  const s = Math.min(window.innerWidth/W, window.innerHeight/H);
+  canvas.style.width = (W*s)+'px'; canvas.style.height = (H*s)+'px';
 }
-resize();
-window.addEventListener('resize', resize);
+resize(); window.addEventListener('resize', resize);
 
-// ── roundRect helper ──
-function rr(x, y, w, h, r) {
-  r = Math.min(r, w/2, h/2);
+function rr(x,y,w,h,r) {
+  r = Math.min(r,w/2,h/2);
   ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.lineTo(x+w-r, y);
-  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-  ctx.lineTo(x+w, y+h-r);
-  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-  ctx.lineTo(x+r, y+h);
-  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-  ctx.lineTo(x, y+r);
-  ctx.quadraticCurveTo(x, y, x+r, y);
-  ctx.closePath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
 }
 
 // ── Audio ──
 let actx = null;
-function ga() {
-  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
-  return actx;
-}
+function ga() { if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)(); return actx; }
 function playKick() {
-  const a = ga();
-  const buf = a.createBuffer(1, a.sampleRate*0.15, a.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1)*Math.pow(1-i/d.length,1.5)*0.8;
-  const s = a.createBufferSource(); s.buffer = buf;
-  const g = a.createGain(); g.gain.value = 0.6;
+  const a=ga(), buf=a.createBuffer(1,a.sampleRate*0.15,a.sampleRate), d=buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,1.5)*0.8;
+  const s=a.createBufferSource(); s.buffer=buf;
+  const g=a.createGain(); g.gain.value=0.6;
   s.connect(g); g.connect(a.destination); s.start();
 }
 function playCrowd(goal) {
-  const a = ga();
-  const dur = goal ? 2 : 1;
-  const buf = a.createBuffer(1, a.sampleRate*dur, a.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < d.length; i++) {
-    const t = i/a.sampleRate;
-    d[i] = (Math.random()*2-1)*Math.min(t*4,1)*Math.pow(1-t/dur,0.5)*(goal?0.5:0.25);
+  const a=ga(), dur=goal?2:1, buf=a.createBuffer(1,a.sampleRate*dur,a.sampleRate), d=buf.getChannelData(0);
+  for (let i=0;i<d.length;i++) {
+    const t=i/a.sampleRate;
+    d[i]=(Math.random()*2-1)*Math.min(t*4,1)*Math.pow(1-t/dur,0.5)*(goal?0.5:0.25);
   }
-  const s = a.createBufferSource(); s.buffer = buf;
-  const f = a.createBiquadFilter(); f.type='bandpass'; f.frequency.value=goal?900:400; f.Q.value=0.8;
+  const s=a.createBufferSource(); s.buffer=buf;
+  const f=a.createBiquadFilter(); f.type='bandpass'; f.frequency.value=goal?900:400; f.Q.value=0.8;
   s.connect(f); f.connect(a.destination); s.start();
 }
 function playWhistle() {
-  const a = ga();
-  const o = a.createOscillator(); const g = a.createGain();
-  o.frequency.setValueAtTime(2400, a.currentTime);
-  o.frequency.linearRampToValueAtTime(2000, a.currentTime+0.5);
-  g.gain.setValueAtTime(0.3, a.currentTime);
-  g.gain.linearRampToValueAtTime(0, a.currentTime+0.5);
+  const a=ga(), o=a.createOscillator(), g=a.createGain();
+  o.frequency.setValueAtTime(2400,a.currentTime); o.frequency.linearRampToValueAtTime(2000,a.currentTime+0.5);
+  g.gain.setValueAtTime(0.3,a.currentTime); g.gain.linearRampToValueAtTime(0,a.currentTime+0.5);
   o.connect(g); g.connect(a.destination); o.start(); o.stop(a.currentTime+0.5);
 }
 
@@ -84,38 +64,50 @@ function playWhistle() {
 const GL=220, GR=580, GT=155, GB=275, GCX=400;
 
 // ── Pre-generate crowd ──
-const crowd = Array.from({length:600}, () => ({
-  x: Math.random()*800, y: Math.random()*170+15,
-  r: Math.random()*2.5+0.8,
-  h: Math.random()>0.5 ? 0 : 215,
-  s: 60+Math.random()*40, l: 50+Math.random()*20
+const crowd = Array.from({length:600},()=>({
+  x:Math.random()*800, y:Math.random()*170+15,
+  r:Math.random()*2.5+0.8,
+  h:Math.random()>0.5?0:215,
+  s:60+Math.random()*40, l:50+Math.random()*20
 }));
 
 // ── State ──
+// phases: intro | korea_aim | korea_power | korea_kicking | korea_result
+//         japan_intro | japan_kicking | japan_result | end
 const G = {
   phase: 'intro',
-  round:0, score:0, maxRounds:5, results:[],
-  mouse:{x:400,y:300},
-  aim:{x:GCX, y:(GT+GB)/2},
-  power:0, powerDir:1,
-  ball:{x:400, y:530, size:15},
-  ballTarget:{x:GCX, y:(GT+GB)/2},
-  ballFlying:false,
-  keeper:{diveDir:0, diveAmt:0},
-  isGoal:false, overBar:false,
-  resultTimer:0,
+  round: 0, maxRounds: 5,
+  koreaScore: 0, japanScore: 0,
+  koreaResults: [], japanResults: [],
+  // Korea kick
+  mouse: {x:400,y:300},
+  aim: {x:GCX, y:(GT+GB)/2},
+  power: 0, powerDir: 1,
+  ball: {x:400,y:530,size:15},
+  ballTarget: {x:GCX,y:(GT+GB)/2},
+  ballFlying: false,
+  keeper: {diveDir:0, diveAmt:0},
+  isGoal: false, overBar: false,
+  // Japan kick
+  japanBall: {x:400,y:530,size:15},
+  japanBallTarget: {x:GCX,y:(GT+GB)/2},
+  japanBallFlying: false,
+  japanIsGoal: false,
+  japanKeeper: {diveDir:0, diveAmt:0},
+  japanIntroTimer: 0,
+  resultTimer: 0,
 };
 
-// ── Draw ──
+// ── Background ──
 function drawBg() {
-  const sky = ctx.createLinearGradient(0,0,0,220);
+  const sky=ctx.createLinearGradient(0,0,0,220);
   sky.addColorStop(0,'#080820'); sky.addColorStop(1,'#162855');
   ctx.fillStyle=sky; ctx.fillRect(0,0,W,220);
-  crowd.forEach(c => {
+  crowd.forEach(c=>{
     ctx.fillStyle=`hsl(${c.h},${c.s}%,${c.l}%)`;
     ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill();
   });
-  [[100,25],[700,25]].forEach(([lx,ly]) => {
+  [[100,25],[700,25]].forEach(([lx,ly])=>{
     const g=ctx.createRadialGradient(lx,ly,2,lx,ly,90);
     g.addColorStop(0,'rgba(255,245,200,0.35)'); g.addColorStop(1,'rgba(255,245,200,0)');
     ctx.fillStyle=g; ctx.fillRect(lx-90,ly-5,180,130);
@@ -124,55 +116,49 @@ function drawBg() {
   field.addColorStop(0,'#1d6b1d'); field.addColorStop(1,'#114811');
   ctx.fillStyle=field; ctx.fillRect(0,220,W,H-220);
   ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
-  for (let x=0;x<=800;x+=40) { ctx.beginPath(); ctx.moveTo(400,235); ctx.lineTo(x,H); ctx.stroke(); }
-  for (let y=260;y<=H;y+=35) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  for (let x=0;x<=800;x+=40){ctx.beginPath();ctx.moveTo(400,235);ctx.lineTo(x,H);ctx.stroke();}
+  for (let y=260;y<=H;y+=35){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(400,492,4,0,Math.PI*2); ctx.fill();
   ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.arc(400,492,82,-Math.PI*0.72,-Math.PI*0.28); ctx.stroke();
 }
 
 function drawGoal() {
-  const L=GL, R=GR, T=GT, B=GB;
+  const L=GL,R=GR,T=GT,B=GB;
   ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.fillRect(L,T,R-L,B-T+22);
   ctx.strokeStyle='rgba(220,220,220,0.13)'; ctx.lineWidth=0.7;
-  for (let x=L;x<=R;x+=18) { ctx.beginPath(); ctx.moveTo(x,T); ctx.lineTo(x+7,B+22); ctx.stroke(); }
-  for (let y=T;y<=B+22;y+=14) { ctx.beginPath(); ctx.moveTo(L,y); ctx.lineTo(R,y); ctx.stroke(); }
+  for(let x=L;x<=R;x+=18){ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x+7,B+22);ctx.stroke();}
+  for(let y=T;y<=B+22;y+=14){ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(R,y);ctx.stroke();}
   ctx.strokeStyle='#f0f0f0'; ctx.lineWidth=6; ctx.lineCap='round';
   ctx.beginPath();
-  ctx.moveTo(L,B+2); ctx.lineTo(L,T);
-  ctx.moveTo(R,B+2); ctx.lineTo(R,T);
-  ctx.moveTo(L,T); ctx.lineTo(R,T);
-  ctx.moveTo(L,B+2); ctx.lineTo(R,B+2);
+  ctx.moveTo(L,B+2);ctx.lineTo(L,T); ctx.moveTo(R,B+2);ctx.lineTo(R,T);
+  ctx.moveTo(L,T);ctx.lineTo(R,T); ctx.moveTo(L,B+2);ctx.lineTo(R,B+2);
   ctx.stroke();
   ctx.strokeStyle='rgba(120,120,120,0.55)'; ctx.lineWidth=3;
   ctx.beginPath();
-  ctx.moveTo(L,B+2); ctx.lineTo(L-9,B+18);
-  ctx.moveTo(R,B+2); ctx.lineTo(R+9,B+18);
-  ctx.moveTo(L-9,B+18); ctx.lineTo(R+9,B+18);
-  ctx.stroke();
+  ctx.moveTo(L,B+2);ctx.lineTo(L-9,B+18); ctx.moveTo(R,B+2);ctx.lineTo(R+9,B+18);
+  ctx.moveTo(L-9,B+18);ctx.lineTo(R+9,B+18); ctx.stroke();
 }
 
-function drawKeeper() {
-  const bx = GCX + G.keeper.diveAmt;
-  const by = GB - 15;
+// jerseyColor: 'korea' or 'japan'
+function drawKeeper(diveAmt, diveDir, jerseyColor) {
+  const bx = GCX + diveAmt, by = GB - 15;
   ctx.save(); ctx.translate(bx, by);
   ctx.fillStyle='rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(0,5,22,6,0,0,Math.PI*2); ctx.fill();
-  // Body
-  ctx.fillStyle='#003087'; rr(-16,-52,32,38,6); ctx.fill();
+  const bodyColor = jerseyColor==='korea' ? '#cd2e3a' : '#003087';
+  const shortsColor = jerseyColor==='korea' ? '#111' : '#001d70';
+  ctx.fillStyle=bodyColor; rr(-16,-52,32,38,6); ctx.fill();
   ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.font='bold 13px Arial'; ctx.textAlign='center'; ctx.fillText('1',0,-30);
-  ctx.fillStyle='#001d70'; ctx.fillRect(-13,-16,26,18);
-  // Head
+  ctx.fillStyle=shortsColor; ctx.fillRect(-13,-16,26,18);
   ctx.fillStyle='#f0c5a0'; ctx.beginPath(); ctx.arc(0,-62,13,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#1a1a1a'; ctx.beginPath(); ctx.arc(0,-68,11,Math.PI*0.1,Math.PI*0.9,true); ctx.fill();
   ctx.fillStyle='#222'; ctx.beginPath(); ctx.arc(-4,-62,2,0,Math.PI*2); ctx.arc(4,-62,2,0,Math.PI*2); ctx.fill();
-  // Gloves
   ctx.fillStyle='#ff6b35';
-  const kd = G.keeper.diveDir;
-  const t = Math.min(Math.abs(G.keeper.diveAmt)/115, 1);
-  if (kd === -1) {
+  const t=Math.min(Math.abs(diveAmt)/115,1);
+  if (diveDir===-1) {
     ctx.save(); ctx.rotate(-t*0.35); rr(-54,-63,38,13,7); ctx.fill(); ctx.restore();
     rr(-20,-40,12,22,5); ctx.fill();
-  } else if (kd === 1) {
+  } else if (diveDir===1) {
     ctx.save(); ctx.rotate(t*0.35); rr(16,-63,38,13,7); ctx.fill(); ctx.restore();
     rr(8,-40,12,22,5); ctx.fill();
   } else {
@@ -183,12 +169,11 @@ function drawKeeper() {
   ctx.restore();
 }
 
-function drawBall() {
-  const b = G.ball;
-  ctx.save(); ctx.translate(b.x, b.y);
+function drawBallAt(b) {
+  ctx.save(); ctx.translate(b.x,b.y);
   ctx.fillStyle='rgba(0,0,0,0.22)'; ctx.beginPath(); ctx.ellipse(2,b.size*0.7,b.size*0.85,b.size*0.28,0,0,Math.PI*2); ctx.fill();
   const bg=ctx.createRadialGradient(-b.size*0.35,-b.size*0.35,b.size*0.05,0,0,b.size);
-  bg.addColorStop(0,'#ffffff'); bg.addColorStop(0.5,'#ddd'); bg.addColorStop(1,'#555');
+  bg.addColorStop(0,'#fff'); bg.addColorStop(0.5,'#ddd'); bg.addColorStop(1,'#555');
   ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(0,0,b.size,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#222';
   ctx.beginPath(); ctx.arc(b.size*0.25,-b.size*0.28,b.size*0.28,0,Math.PI*2); ctx.fill();
@@ -197,14 +182,13 @@ function drawBall() {
 }
 
 function drawAim() {
-  if (G.phase !== 'aiming') return;
-  const {x,y} = G.aim;
-  const inside = x>=GL && x<=GR && y>=GT && y<=GB;
+  if (G.phase!=='korea_aim') return;
+  const {x,y}=G.aim;
+  const inside=x>=GL&&x<=GR&&y>=GT&&y<=GB;
   ctx.save();
   if (inside) {
     ctx.strokeStyle='rgba(255,230,0,0.9)'; ctx.lineWidth=2;
-    ctx.setLineDash([5,4]); ctx.beginPath(); ctx.arc(x,y,14,0,Math.PI*2); ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.setLineDash([5,4]); ctx.beginPath(); ctx.arc(x,y,14,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
     ctx.strokeStyle='rgba(255,230,0,0.95)'; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(x-22,y); ctx.lineTo(x+22,y); ctx.moveTo(x,y-22); ctx.lineTo(x,y+22); ctx.stroke();
   } else {
@@ -215,12 +199,12 @@ function drawAim() {
 }
 
 function drawPower() {
-  if (G.phase !== 'power' && G.phase !== 'kicking') return;
-  const bx=730, by=140, bw=28, bh=240;
+  if (G.phase!=='korea_power' && G.phase!=='korea_kicking') return;
+  const bx=730,by=140,bw=28,bh=240;
   ctx.fillStyle='rgba(0,0,0,0.78)'; rr(bx-6,by-25,bw+12,bh+46,8); ctx.fill();
   ctx.fillStyle='#aaa'; ctx.font='bold 11px Arial'; ctx.textAlign='center'; ctx.fillText('POWER',bx+bw/2,by-10);
   ctx.fillStyle='#222'; rr(bx,by,bw,bh,4); ctx.fill();
-  const fillH = bh*G.power/100;
+  const fillH=bh*G.power/100;
   const pg=ctx.createLinearGradient(0,by+bh,0,by);
   pg.addColorStop(0,'#00dd55'); pg.addColorStop(0.55,'#ffdd00'); pg.addColorStop(1,'#ff2200');
   ctx.fillStyle=pg;
@@ -228,46 +212,82 @@ function drawPower() {
   ctx.fillStyle='#fff'; ctx.font='bold 13px Arial'; ctx.fillText(Math.round(G.power)+'%',bx+bw/2,by+bh+16);
 }
 
+// ── Scoreboard ──
 function drawScore() {
-  const sx=235, sy=8, sw=330, sh=60;
+  const sx=180,sy=8,sw=440,sh=72;
   ctx.fillStyle='rgba(0,0,0,0.82)'; rr(sx,sy,sw,sh,10); ctx.fill();
-  ctx.font='bold 17px Arial'; ctx.textAlign='right'; ctx.fillStyle='#cd2e3a';
-  ctx.fillText('🇰🇷 KOR', sx+sw/2-18, sy+28);
-  ctx.font='bold 26px Arial'; ctx.textAlign='center'; ctx.fillStyle='#fff';
-  ctx.fillText(`${G.score} - ${G.round-G.score}`, sx+sw/2, sy+30);
-  ctx.font='bold 17px Arial'; ctx.textAlign='left'; ctx.fillStyle='#aaa';
-  ctx.fillText('JPN 🇯🇵', sx+sw/2+18, sy+28);
+
+  // Korea
+  ctx.font='bold 14px Arial'; ctx.textAlign='center'; ctx.fillStyle='#cd2e3a';
+  ctx.fillText('🇰🇷 한국', sx+90, sy+20);
+  ctx.font='bold 32px Arial'; ctx.fillStyle='#fff';
+  ctx.fillText(G.koreaScore, sx+90, sy+52);
+
+  // vs
+  ctx.font='bold 18px Arial'; ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('VS', sx+sw/2, sy+38);
+
+  // Japan
+  ctx.font='bold 14px Arial'; ctx.fillStyle='#aaa';
+  ctx.fillText('일본 🇯🇵', sx+sw-90, sy+20);
+  ctx.font='bold 32px Arial'; ctx.fillStyle='#fff';
+  ctx.fillText(G.japanScore, sx+sw-90, sy+52);
+
+  // Korea round dots
   for (let i=0;i<G.maxRounds;i++) {
-    const cx=sx+30+i*65, cy=sy+sh-10;
-    ctx.beginPath(); ctx.arc(cx,cy,7,0,Math.PI*2);
-    if (i<G.results.length) {
-      ctx.fillStyle=G.results[i]?'#00dd55':'#ff3333'; ctx.fill();
+    const cx=sx+160+i*26, cy=sy+sh-14;
+    ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2);
+    if (i<G.koreaResults.length) {
+      ctx.fillStyle=G.koreaResults[i]?'#00dd55':'#ff3333'; ctx.fill();
     } else {
-      ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.stroke();
     }
   }
-  ctx.font='12px Arial'; ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.45)';
-  const lbl = G.phase==='end' ? '경기 종료' : `${G.round+1} / ${G.maxRounds} 라운드`;
-  ctx.fillText(lbl, sx+sw/2, sy+sh+13);
+  // Japan round dots
+  for (let i=0;i<G.maxRounds;i++) {
+    const cx=sx+sw-160+i*26-G.maxRounds*13+13, cy=sy+sh-14;
+    ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2);
+    if (i<G.japanResults.length) {
+      ctx.fillStyle=G.japanResults[i]?'#00dd55':'#ff3333'; ctx.fill();
+    } else {
+      ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.stroke();
+    }
+  }
+  // Round label
+  ctx.font='11px Arial'; ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.4)';
+  const rnd = G.round+1 > G.maxRounds ? G.maxRounds : G.round+1;
+  ctx.fillText(`${rnd} / ${G.maxRounds} 라운드`, sx+sw/2, sy+sh+13);
 }
 
 function drawHint() {
-  let txt = '';
-  if (G.phase==='aiming') txt='⬆ 골대를 클릭해서 방향 선택!';
-  else if (G.phase==='power') txt='⚡ 다시 클릭해서 파워 결정!';
+  let txt='';
+  if (G.phase==='korea_aim') txt='⬆ 골대를 클릭해서 방향 선택!';
+  else if (G.phase==='korea_power') txt='⚡ 다시 클릭해서 파워 결정!';
   if (!txt) return;
   ctx.fillStyle='rgba(0,0,0,0.65)'; rr(180,556,440,34,8); ctx.fill();
   ctx.fillStyle='#fff'; ctx.font='bold 14px Arial'; ctx.textAlign='center'; ctx.fillText(txt,400,578);
 }
 
-function drawRoundResult() {
-  if (G.phase !== 'roundResult') return;
-  ctx.fillStyle = G.isGoal ? 'rgba(0,175,55,0.9)' : 'rgba(175,20,20,0.9)';
-  rr(238,200,324,115,18); ctx.fill();
+function drawTurnBanner(isKorea) {
+  const color = isKorea ? 'rgba(180,20,20,0.88)' : 'rgba(0,40,135,0.88)';
+  const flag = isKorea ? '🇰🇷' : '🇯🇵';
+  const name = isKorea ? '한국의 차례!' : '일본의 차례!';
+  ctx.fillStyle=color; rr(250,195,300,80,16); ctx.fill();
+  ctx.font='bold 32px Arial'; ctx.textAlign='center'; ctx.fillStyle='#fff';
+  ctx.fillText(`${flag} ${name}`, 400, 245);
+}
+
+function drawResultBanner(isGoal, overBar, isKorea) {
+  ctx.fillStyle=isGoal?'rgba(0,175,55,0.9)':'rgba(175,20,20,0.9)';
+  rr(240,200,320,115,18); ctx.fill();
+  const emoji = isGoal?'⚽ GOAL!':(overBar?'💨 OVER!':'🧤 SAVE!');
   ctx.font='bold 46px Arial'; ctx.textAlign='center'; ctx.fillStyle='#fff';
-  ctx.fillText(G.isGoal ? '⚽ GOAL!' : (G.overBar ? '💨 OVER!' : '🧤 SAVE!'), 400, 258);
+  ctx.fillText(emoji, 400, 258);
   ctx.font='18px Arial'; ctx.fillStyle='rgba(255,255,255,0.85)';
-  ctx.fillText(G.isGoal ? '득점 성공!' : (G.overBar ? '너무 강했다!' : '키퍼가 막았다!'), 400, 294);
+  let sub = '';
+  if (isGoal) sub = isKorea ? '한국 득점!' : '일본 득점!';
+  else sub = overBar ? '너무 강했다!' : (isKorea ? '키퍼가 막았다!' : '한국 골키퍼 선방!');
+  ctx.fillText(sub, 400, 294);
 }
 
 function drawIntro() {
@@ -275,65 +295,103 @@ function drawIntro() {
   ctx.textAlign='center';
   ctx.font='bold 52px Arial'; ctx.fillStyle='#fff'; ctx.fillText('⚽ 한일전 승부차기',400,155);
   ctx.font='28px Arial'; ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.fillText('🇰🇷 한국  vs  일본 🇯🇵',400,215);
-  ctx.font='17px Arial'; ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.fillText('5번의 기회, 더 많이 넣으면 승리!',400,260);
-  const bx=290, by=300, bw=220, bh=56;
+  ctx.font='17px Arial'; ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.fillText('5번씩 번갈아 차서 더 많이 넣으면 승리!',400,262);
+  const bx=290,by=302,bw=220,bh=56;
   const bg=ctx.createLinearGradient(bx,by,bx,by+bh);
   bg.addColorStop(0,'#e83040'); bg.addColorStop(1,'#8b0000');
   ctx.fillStyle=bg; rr(bx,by,bw,bh,14); ctx.fill();
-  ctx.fillStyle='#fff'; ctx.font='bold 22px Arial'; ctx.fillText('🎮 시작하기',400,337);
+  ctx.fillStyle='#fff'; ctx.font='bold 22px Arial'; ctx.fillText('🎮 시작하기',400,339);
   ctx.font='13px Arial'; ctx.fillStyle='rgba(255,255,255,0.4)';
-  ctx.fillText('클릭 → 방향  |  클릭 → 파워  |  슛!',400,388);
+  ctx.fillText('클릭 → 방향  |  클릭 → 파워  |  슛!',400,390);
 }
 
 function drawEnd() {
   ctx.fillStyle='rgba(0,0,0,0.82)'; ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';
-  const win = G.score > G.maxRounds-G.score;
-  const draw = G.score === G.maxRounds-G.score;
+  const win=G.koreaScore>G.japanScore, draw=G.koreaScore===G.japanScore;
   ctx.font='bold 44px Arial';
-  ctx.fillStyle = win?'#ffd700': draw?'#88aaff':'#ff7777';
-  ctx.fillText(win?'🏆 대~한민국!': draw?'무승부!':'😢 다음엔 이기자!', 400, 145);
-  ctx.font='bold 82px Arial'; ctx.fillStyle='#fff';
-  ctx.fillText(`${G.score} - ${G.maxRounds-G.score}`,400,248);
+  ctx.fillStyle=win?'#ffd700':draw?'#88aaff':'#ff7777';
+  ctx.fillText(win?'🏆 대~한민국!':draw?'무승부!':'😢 다음엔 이기자!', 400,140);
+  // Score
+  ctx.font='bold 72px Arial'; ctx.fillStyle='#fff';
+  ctx.fillText(`${G.koreaScore} - ${G.japanScore}`, 400,230);
   ctx.font='20px Arial'; ctx.fillStyle='rgba(255,255,255,0.7)';
-  ctx.fillText('🇰🇷 한국                       일본 🇯🇵',400,280);
-  for (let i=0;i<G.results.length;i++) {
-    ctx.font='30px Arial';
-    ctx.fillText(G.results[i]?'⚽':'✗', 265+i*57, 335);
+  ctx.fillText('🇰🇷 한국                       일본 🇯🇵',400,262);
+  // Korea results
+  ctx.font='13px Arial'; ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fillText('한국',220,295);
+  for (let i=0;i<G.koreaResults.length;i++) {
+    ctx.font='26px Arial'; ctx.fillStyle=G.koreaResults[i]?'#00dd55':'rgba(255,255,255,0.4)';
+    ctx.fillText(G.koreaResults[i]?'⚽':'✗', 260+i*50, 318);
   }
-  ctx.font='16px Arial'; ctx.fillStyle='rgba(255,255,255,0.5)';
-  ctx.fillText(win?`${G.score}골 성공! 일본 격파!`:`${G.score}골... 분발하자!`, 400,370);
-  const bx=280, by=398, bw=240, bh=56;
+  // Japan results
+  ctx.font='13px Arial'; ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fillText('일본',220,345);
+  for (let i=0;i<G.japanResults.length;i++) {
+    ctx.font='26px Arial'; ctx.fillStyle=G.japanResults[i]?'#ff6666':'rgba(255,255,255,0.4)';
+    ctx.fillText(G.japanResults[i]?'⚽':'✗', 260+i*50, 368);
+  }
+  const bx=280,by=395,bw=240,bh=56;
   const bg=ctx.createLinearGradient(bx,by,bx,by+bh);
   bg.addColorStop(0,'#2196F3'); bg.addColorStop(1,'#0d47a1');
   ctx.fillStyle=bg; rr(bx,by,bw,bh,14); ctx.fill();
-  ctx.fillStyle='#fff'; ctx.font='bold 22px Arial'; ctx.fillText('🔄 다시 하기',400,435);
+  ctx.fillStyle='#fff'; ctx.font='bold 22px Arial'; ctx.fillText('🔄 다시 하기',400,432);
 }
 
 // ── Logic ──
-function checkGoal() {
-  const {x,y} = G.ballTarget;
-  const pw = G.power;
-  const kd = G.keeper.diveDir;
+function koreaCheckGoal() {
+  const {x,y}=G.ballTarget, pw=G.power, kd=G.keeper.diveDir;
   if (x<GL||x>GR||y<GT||y>GB) return false;
   if (pw<12) return false;
-  if (pw>93 && y<GT+40) { G.overBar=true; return false; }
+  if (pw>93&&y<GT+40) { G.overBar=true; return false; }
   const relX=(x-GL)/(GR-GL);
-  const zone = relX<0.33?-1: relX<0.67?0:1;
+  const zone=relX<0.33?-1:relX<0.67?0:1;
   if (pw>80) return true;
-  return zone !== kd;
+  return zone!==kd;
+}
+
+function setupJapanKick() {
+  // Japan picks a random target in the goal
+  const zones = [
+    {x:GL+50, y:GT+30}, {x:GCX, y:GT+20}, {x:GR-50, y:GT+30},
+    {x:GL+60, y:GT+80}, {x:GCX, y:GT+70}, {x:GR-60, y:GT+80},
+  ];
+  const t = zones[Math.floor(Math.random()*zones.length)];
+  // small random offset
+  t.x += (Math.random()-0.5)*40;
+  t.y += (Math.random()-0.5)*20;
+  G.japanBallTarget = t;
+  G.japanBall = {x:400, y:530, size:15};
+  G.japanKeeper = {diveDir:[-1,0,1][Math.floor(Math.random()*3)], diveAmt:0};
+  // Japan scores ~65% of the time
+  const relX=(t.x-GL)/(GR-GL);
+  const zone=relX<0.33?-1:relX<0.67?0:1;
+  G.japanIsGoal = (zone!==G.japanKeeper.diveDir) || (Math.random()<0.2);
+}
+
+function animateBall(ball, target, power, dt) {
+  const dx=target.x-ball.x, dy=target.y-ball.y;
+  const dist=Math.hypot(dx,dy);
+  const initDist=Math.hypot(target.x-400,target.y-530);
+  if (dist>4) {
+    const spd=(500+power*4)*dt;
+    ball.x+=dx/dist*spd; ball.y+=dy/dist*spd;
+    ball.size=15-(1-dist/initDist)*9;
+    return false; // still flying
+  }
+  ball.x=target.x; ball.y=target.y; ball.size=6;
+  return true; // arrived
 }
 
 function resetRound() {
-  G.phase='aiming'; G.power=0; G.powerDir=1; G.ballFlying=false;
-  G.ball={x:400,y:530,size:15};
+  G.phase='korea_aim'; G.power=0; G.powerDir=1;
+  G.ballFlying=false; G.ball={x:400,y:530,size:15};
   G.aim={x:GCX,y:(GT+GB)/2};
-  G.keeper.diveDir=0; G.keeper.diveAmt=0;
+  G.keeper={diveDir:0,diveAmt:0};
   G.overBar=false;
 }
 
 function startGame() {
-  G.round=0; G.score=0; G.results=[];
+  G.round=0; G.koreaScore=0; G.japanScore=0;
+  G.koreaResults=[]; G.japanResults=[];
   resetRound(); playWhistle();
 }
 
@@ -344,51 +402,95 @@ function loop(ts) {
   ctx.clearRect(0,0,W,H);
 
   if (G.phase==='intro') {
-    drawBg(); drawGoal(); drawKeeper(); drawBall(); drawIntro();
-  } else if (G.phase==='end') {
-    drawBg(); drawGoal(); drawEnd();
-  } else {
-    // Power oscillates
-    if (G.phase==='power') {
-      G.power += G.powerDir*dt*72;
-      if (G.power>=100) { G.power=100; G.powerDir=-1; }
-      if (G.power<=0) { G.power=0; G.powerDir=1; }
-    }
-    // Kicking animation
-    if (G.phase==='kicking') {
-      const tgt=G.keeper.diveDir*115;
-      G.keeper.diveAmt += (tgt-G.keeper.diveAmt)*Math.min(dt*10,1);
-      if (G.ballFlying) {
-        const dx=G.ballTarget.x-G.ball.x, dy=G.ballTarget.y-G.ball.y;
-        const dist=Math.hypot(dx,dy);
-        const initDist=Math.hypot(G.ballTarget.x-400, G.ballTarget.y-530);
-        if (dist>4) {
-          const spd=(500+G.power*4)*dt;
-          G.ball.x+=dx/dist*spd; G.ball.y+=dy/dist*spd;
-          G.ball.size=15-(1-dist/initDist)*9;
-        } else {
-          G.ballFlying=false;
-          G.ball.x=G.ballTarget.x; G.ball.y=G.ballTarget.y; G.ball.size=6;
-          G.isGoal=checkGoal();
-          if (G.isGoal) G.score++;
-          G.results.push(G.isGoal); G.round++;
-          playCrowd(G.isGoal);
-          G.phase='roundResult'; G.resultTimer=2.2;
-        }
-      }
-    }
-    if (G.phase==='roundResult') {
-      const tgt=G.keeper.diveDir*115;
-      G.keeper.diveAmt += (tgt-G.keeper.diveAmt)*Math.min(dt*10,1);
-      G.resultTimer-=dt;
-      if (G.resultTimer<=0) {
-        if (G.round>=G.maxRounds) G.phase='end';
-        else resetRound();
-      }
-    }
-    drawBg(); drawGoal(); drawKeeper(); drawBall();
-    drawAim(); drawPower(); drawScore(); drawHint(); drawRoundResult();
+    drawBg(); drawGoal(); drawKeeper(0,0,'japan'); drawBallAt(G.ball); drawIntro();
+    requestAnimationFrame(loop); return;
   }
+  if (G.phase==='end') {
+    drawBg(); drawGoal(); drawEnd();
+    requestAnimationFrame(loop); return;
+  }
+
+  // ── Korea phases ──
+  if (G.phase==='korea_power') {
+    G.power+=G.powerDir*dt*72;
+    if (G.power>=100){G.power=100;G.powerDir=-1;}
+    if (G.power<=0){G.power=0;G.powerDir=1;}
+  }
+  if (G.phase==='korea_kicking') {
+    const tgt=G.keeper.diveDir*115;
+    G.keeper.diveAmt+=(tgt-G.keeper.diveAmt)*Math.min(dt*10,1);
+    if (G.ballFlying) {
+      const done=animateBall(G.ball,G.ballTarget,G.power,dt);
+      if (done) {
+        G.ballFlying=false;
+        G.isGoal=koreaCheckGoal();
+        if (G.isGoal) G.koreaScore++;
+        G.koreaResults.push(G.isGoal);
+        playCrowd(G.isGoal);
+        G.phase='korea_result'; G.resultTimer=2;
+      }
+    }
+  }
+  if (G.phase==='korea_result') {
+    const tgt=G.keeper.diveDir*115;
+    G.keeper.diveAmt+=(tgt-G.keeper.diveAmt)*Math.min(dt*10,1);
+    G.resultTimer-=dt;
+    if (G.resultTimer<=0) {
+      setupJapanKick();
+      G.phase='japan_intro'; G.japanIntroTimer=1.5;
+    }
+  }
+
+  // ── Japan phases ──
+  if (G.phase==='japan_intro') {
+    G.japanIntroTimer-=dt;
+    if (G.japanIntroTimer<=0) { G.japanBallFlying=true; G.phase='japan_kicking'; playKick(); }
+  }
+  if (G.phase==='japan_kicking') {
+    const tgt2=G.japanKeeper.diveDir*115;
+    G.japanKeeper.diveAmt+=(tgt2-G.japanKeeper.diveAmt)*Math.min(dt*10,1);
+    if (G.japanBallFlying) {
+      const done=animateBall(G.japanBall,G.japanBallTarget,70,dt);
+      if (done) {
+        G.japanBallFlying=false;
+        G.japanResults.push(G.japanIsGoal);
+        if (G.japanIsGoal) G.japanScore++;
+        playCrowd(G.japanIsGoal);
+        G.phase='japan_result'; G.resultTimer=2;
+      }
+    }
+  }
+  if (G.phase==='japan_result') {
+    const tgt2=G.japanKeeper.diveDir*115;
+    G.japanKeeper.diveAmt+=(tgt2-G.japanKeeper.diveAmt)*Math.min(dt*10,1);
+    G.resultTimer-=dt;
+    if (G.resultTimer<=0) {
+      G.round++;
+      if (G.round>=G.maxRounds) G.phase='end';
+      else resetRound();
+    }
+  }
+
+  // ── Draw ──
+  drawBg(); drawGoal();
+
+  if (G.phase==='japan_intro'||G.phase==='japan_kicking'||G.phase==='japan_result') {
+    // Japan kicking: Korea keeper in goal
+    drawKeeper(G.japanKeeper.diveAmt, G.japanKeeper.diveDir, 'korea');
+    drawBallAt(G.japanBall);
+  } else {
+    // Korea kicking: Japan keeper in goal
+    drawKeeper(G.keeper.diveAmt, G.keeper.diveDir, 'japan');
+    drawBallAt(G.ball);
+  }
+
+  drawAim(); drawPower(); drawScore(); drawHint();
+
+  if (G.phase==='korea_aim') drawTurnBanner(true);
+  if (G.phase==='japan_intro') drawTurnBanner(false);
+  if (G.phase==='korea_result') drawResultBanner(G.isGoal, G.overBar, true);
+  if (G.phase==='japan_result') drawResultBanner(G.japanIsGoal, false, false);
+
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -396,33 +498,29 @@ requestAnimationFrame(loop);
 // ── Input ──
 function canvasPos(cx,cy) {
   const r=canvas.getBoundingClientRect();
-  return { x:(cx-r.left)*(W/r.width), y:(cy-r.top)*(H/r.height) };
+  return {x:(cx-r.left)*(W/r.width), y:(cy-r.top)*(H/r.height)};
 }
-
-canvas.addEventListener('mousemove', e => {
+canvas.addEventListener('mousemove', e=>{
   const {x,y}=canvasPos(e.clientX,e.clientY);
   G.mouse={x,y};
-  if (G.phase==='aiming') G.aim={x,y};
+  if (G.phase==='korea_aim') G.aim={x,y};
 });
-
-canvas.addEventListener('click', e => {
+canvas.addEventListener('click', e=>{
   ga();
   const {x,y}=canvasPos(e.clientX,e.clientY);
-  if (G.phase==='intro') { if(x>=290&&x<=510&&y>=300&&y<=356) startGame(); return; }
-  if (G.phase==='end')   { if(x>=280&&x<=520&&y>=398&&y<=454) startGame(); return; }
-  if (G.phase==='aiming') {
-    if (x>=GL&&x<=GR&&y>=GT&&y<=GB) { G.aim={x,y}; G.ballTarget={x,y}; G.phase='power'; G.power=0; G.powerDir=1; }
+  if (G.phase==='intro') { if(x>=290&&x<=510&&y>=302&&y<=358) startGame(); return; }
+  if (G.phase==='end')   { if(x>=280&&x<=520&&y>=395&&y<=451) startGame(); return; }
+  if (G.phase==='korea_aim') {
+    if (x>=GL&&x<=GR&&y>=GT&&y<=GB) {G.aim={x,y};G.ballTarget={x,y};G.phase='korea_power';G.power=0;G.powerDir=1;}
     return;
   }
-  if (G.phase==='power') {
+  if (G.phase==='korea_power') {
     G.keeper.diveDir=[-1,0,1][Math.floor(Math.random()*3)];
-    G.ballFlying=true; G.phase='kicking'; playKick();
-    return;
+    G.ballFlying=true; G.phase='korea_kicking'; playKick(); return;
   }
 });
-
-canvas.addEventListener('touchstart', e=>{ e.preventDefault(); const t=e.touches[0]; canvas.dispatchEvent(new MouseEvent('click',{clientX:t.clientX,clientY:t.clientY})); },{passive:false});
-canvas.addEventListener('touchmove', e=>{ e.preventDefault(); const t=e.touches[0]; canvas.dispatchEvent(new MouseEvent('mousemove',{clientX:t.clientX,clientY:t.clientY})); },{passive:false});
+canvas.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];canvas.dispatchEvent(new MouseEvent('click',{clientX:t.clientX,clientY:t.clientY}));},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];canvas.dispatchEvent(new MouseEvent('mousemove',{clientX:t.clientX,clientY:t.clientY}));},{passive:false});
 </script>
 </body>
 </html>
