@@ -1,5 +1,5 @@
-const SB_URL = 'https://pshwspycsfinlkppdwto.supabase.co';
-const SB_ANON = 'sb_publishable_dptKe70c_js2Ow-iFdjxgg_rVYIBa4m';
+const SB_URL = 'https://fnzcoeihrnttzbfhdagc.supabase.co';
+const SB_ANON = 'sb_publishable_HfTJy0m0moC1eXoVJKXlcQ_NX1Ii035';
 const SB_HEADERS = { apikey: SB_ANON, Authorization: `Bearer ${SB_ANON}` };
 
 async function dbFetchPosts() {
