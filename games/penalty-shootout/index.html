@@ -96,6 +96,7 @@ const G = {
   japanKeeper: {diveDir:0, diveAmt:0},
   japanIntroTimer: 0,
   resultTimer: 0,
+  turnBannerTimer: 0, // 차례 배너 표시 시간
 };
 
 // ── Background ──
@@ -143,7 +144,9 @@ function drawGoal() {
 // jerseyColor: 'korea' or 'japan'
 function drawKeeper(diveAmt, diveDir, jerseyColor) {
   const bx = GCX + diveAmt, by = GB - 15;
-  ctx.save(); ctx.translate(bx, by);
+  const t = Math.min(Math.abs(diveAmt)/115, 1);
+  const tilt = diveDir * t * 0.55; // whole body tilts in dive direction
+  ctx.save(); ctx.translate(bx, by); ctx.rotate(tilt);
   ctx.fillStyle='rgba(0,0,0,0.18)'; ctx.beginPath(); ctx.ellipse(0,5,22,6,0,0,Math.PI*2); ctx.fill();
   const bodyColor = jerseyColor==='korea' ? '#cd2e3a' : '#003087';
   const shortsColor = jerseyColor==='korea' ? '#111' : '#001d70';
@@ -154,14 +157,16 @@ function drawKeeper(diveAmt, diveDir, jerseyColor) {
   ctx.fillStyle='#1a1a1a'; ctx.beginPath(); ctx.arc(0,-68,11,Math.PI*0.1,Math.PI*0.9,true); ctx.fill();
   ctx.fillStyle='#222'; ctx.beginPath(); ctx.arc(-4,-62,2,0,Math.PI*2); ctx.arc(4,-62,2,0,Math.PI*2); ctx.fill();
   ctx.fillStyle='#ff6b35';
-  const t=Math.min(Math.abs(diveAmt)/115,1);
   if (diveDir===-1) {
-    ctx.save(); ctx.rotate(-t*0.35); rr(-54,-63,38,13,7); ctx.fill(); ctx.restore();
-    rr(-20,-40,12,22,5); ctx.fill();
+    // 왼쪽 다이브: 양팔 왼쪽 위로 뻗기
+    rr(-62,-72,50,14,7); ctx.fill(); // 양팔 수평 뻗음
+    rr(-18,-72,14,24,5); ctx.fill(); // 몸통-팔 연결
   } else if (diveDir===1) {
-    ctx.save(); ctx.rotate(t*0.35); rr(16,-63,38,13,7); ctx.fill(); ctx.restore();
-    rr(8,-40,12,22,5); ctx.fill();
+    // 오른쪽 다이브: 양팔 오른쪽 위로 뻗기
+    rr(12,-72,50,14,7); ctx.fill();
+    rr(4,-72,14,24,5); ctx.fill();
   } else {
+    // 정자세
     rr(-28,-50,12,30,5); ctx.fill(); rr(16,-50,12,30,5); ctx.fill();
   }
   ctx.fillStyle='#fff'; ctx.fillRect(-11,2,9,20); ctx.fillRect(2,2,9,20);
@@ -233,20 +238,20 @@ function drawScore() {
   ctx.font='bold 32px Arial'; ctx.fillStyle='#fff';
   ctx.fillText(G.japanScore, sx+sw-90, sy+52);
 
-  // Korea round dots
+  // Korea round dots (왼쪽 영역에 위치)
   for (let i=0;i<G.maxRounds;i++) {
-    const cx=sx+160+i*26, cy=sy+sh-14;
-    ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2);
+    const cx=sx+22+i*20, cy=sy+sh-13;
+    ctx.beginPath(); ctx.arc(cx,cy,7,0,Math.PI*2);
     if (i<G.koreaResults.length) {
       ctx.fillStyle=G.koreaResults[i]?'#00dd55':'#ff3333'; ctx.fill();
     } else {
       ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.stroke();
     }
   }
-  // Japan round dots
+  // Japan round dots (오른쪽 영역에 위치)
   for (let i=0;i<G.maxRounds;i++) {
-    const cx=sx+sw-160+i*26-G.maxRounds*13+13, cy=sy+sh-14;
-    ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2);
+    const cx=sx+sw-22-i*20, cy=sy+sh-13;
+    ctx.beginPath(); ctx.arc(cx,cy,7,0,Math.PI*2);
     if (i<G.japanResults.length) {
       ctx.fillStyle=G.japanResults[i]?'#00dd55':'#ff3333'; ctx.fill();
     } else {
@@ -387,6 +392,7 @@ function resetRound() {
   G.aim={x:GCX,y:(GT+GB)/2};
   G.keeper={diveDir:0,diveAmt:0};
   G.overBar=false;
+  G.turnBannerTimer=1.8; // 한국의 차례 배너 1.8초 표시
 }
 
 function startGame() {
@@ -409,6 +415,9 @@ function loop(ts) {
     drawBg(); drawGoal(); drawEnd();
     requestAnimationFrame(loop); return;
   }
+
+  // 배너 타이머 감소
+  if (G.turnBannerTimer > 0) G.turnBannerTimer -= dt;
 
   // ── Korea phases ──
   if (G.phase==='korea_power') {
@@ -486,7 +495,7 @@ function loop(ts) {
 
   drawAim(); drawPower(); drawScore(); drawHint();
 
-  if (G.phase==='korea_aim') drawTurnBanner(true);
+  if ((G.phase==='korea_aim'||G.phase==='korea_power') && G.turnBannerTimer>0) drawTurnBanner(true);
   if (G.phase==='japan_intro') drawTurnBanner(false);
   if (G.phase==='korea_result') drawResultBanner(G.isGoal, G.overBar, true);
   if (G.phase==='japan_result') drawResultBanner(G.japanIsGoal, false, false);
