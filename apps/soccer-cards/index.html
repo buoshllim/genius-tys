@@ -716,9 +716,7 @@ async function doLogin() {
 // PACK
 // ═══════════════════════════════════════════════════════
 async function canOpen() {
-  const rows = await db.get('tys_pack_opens', `user_id=eq.${user.id}&limit=1`);
-  if (!rows.length) return true;
-  return new Date(rows[0].last_opened_at).toDateString() !== new Date().toDateString();
+  return true; // DEV: 무제한 오픈
 }
 
 function nextTime() {
