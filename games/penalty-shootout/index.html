@@ -44,14 +44,34 @@ function playKick() {
   s.connect(g); g.connect(a.destination); s.start();
 }
 function playCrowd(goal) {
-  const a=ga(), dur=goal?2:1, buf=a.createBuffer(1,a.sampleRate*dur,a.sampleRate), d=buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) {
-    const t=i/a.sampleRate;
-    d[i]=(Math.random()*2-1)*Math.min(t*4,1)*Math.pow(1-t/dur,0.5)*(goal?0.5:0.25);
-  }
-  const s=a.createBufferSource(); s.buffer=buf;
-  const f=a.createBiquadFilter(); f.type='bandpass'; f.frequency.value=goal?900:400; f.Q.value=0.8;
-  s.connect(f); f.connect(a.destination); s.start();
+  try {
+    const a = ga();
+    if (a.state === 'suspended') a.resume();
+    const now = a.currentTime;
+    if (goal) {
+      // 환호성 - 오실레이터 4개 겹치기 (버퍼 루프 없음)
+      for (let i = 0; i < 4; i++) {
+        const o = a.createOscillator(), g = a.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(280 + i*110, now + i*0.07);
+        o.frequency.linearRampToValueAtTime(480 + i*110, now + i*0.07 + 0.35);
+        g.gain.setValueAtTime(0.07, now + i*0.07);
+        g.gain.linearRampToValueAtTime(0, now + i*0.07 + 0.4);
+        o.connect(g); g.connect(a.destination);
+        o.start(now + i*0.07); o.stop(now + i*0.07 + 0.45);
+      }
+    } else {
+      // 아쉬운 탄식
+      const o = a.createOscillator(), g = a.createGain();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(240, now);
+      o.frequency.linearRampToValueAtTime(160, now + 0.5);
+      g.gain.setValueAtTime(0.05, now);
+      g.gain.linearRampToValueAtTime(0, now + 0.5);
+      o.connect(g); g.connect(a.destination);
+      o.start(); o.stop(now + 0.55);
+    }
+  } catch(e) {}
 }
 function playWhistle() {
   const a=ga(), o=a.createOscillator(), g=a.createGain();
@@ -436,7 +456,7 @@ function loop(ts) {
         if (G.isGoal) G.koreaScore++;
         G.koreaResults.push(G.isGoal);
         G.phase='korea_result'; G.resultTimer=2;
-        const _kr=G.isGoal; setTimeout(()=>playCrowd(_kr),0);
+        playCrowd(G.isGoal);
       }
     }
   }
@@ -465,7 +485,7 @@ function loop(ts) {
         G.japanResults.push(G.japanIsGoal);
         if (G.japanIsGoal) G.japanScore++;
         G.phase='japan_result'; G.resultTimer=2;
-        const _jr=G.japanIsGoal; setTimeout(()=>playCrowd(_jr),0);
+        playCrowd(G.japanIsGoal);
       }
     }
   }
