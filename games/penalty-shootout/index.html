@@ -116,7 +116,8 @@ const G = {
   japanKeeper: {diveDir:0, diveAmt:0},
   japanIntroTimer: 0,
   resultTimer: 0,
-  turnBannerTimer: 0, // 차례 배너 표시 시간
+  turnBannerTimer: 0,
+  suddenDeath: false,
 };
 
 // ── Background ──
@@ -279,9 +280,15 @@ function drawScore() {
     }
   }
   // Round label
-  ctx.font='11px Arial'; ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,0.4)';
-  const rnd = G.round+1 > G.maxRounds ? G.maxRounds : G.round+1;
-  ctx.fillText(`${rnd} / ${G.maxRounds} 라운드`, sx+sw/2, sy+sh+13);
+  ctx.font='bold 11px Arial'; ctx.textAlign='center';
+  if (G.suddenDeath) {
+    ctx.fillStyle='#ffcc00';
+    ctx.fillText('⚡ 서든 데스!', sx+sw/2, sy+sh+13);
+  } else {
+    const rnd = G.round+1 > G.maxRounds ? G.maxRounds : G.round+1;
+    ctx.fillStyle='rgba(255,255,255,0.4)';
+    ctx.fillText(`${rnd} / ${G.maxRounds} 라운드`, sx+sw/2, sy+sh+13);
+  }
 }
 
 function drawHint() {
@@ -333,10 +340,10 @@ function drawIntro() {
 function drawEnd() {
   ctx.fillStyle='rgba(0,0,0,0.82)'; ctx.fillRect(0,0,W,H);
   ctx.textAlign='center';
-  const win=G.koreaScore>G.japanScore, draw=G.koreaScore===G.japanScore;
+  const win = G.koreaScore > G.japanScore;
   ctx.font='bold 44px Arial';
-  ctx.fillStyle=win?'#ffd700':draw?'#88aaff':'#ff7777';
-  ctx.fillText(win?'🏆 대~한민국!':draw?'무승부!':'😢 다음엔 이기자!', 400,140);
+  ctx.fillStyle = win ? '#ffd700' : '#ff7777';
+  ctx.fillText(win ? '🏆 대~한민국!' : '😢 다음엔 이기자!', 400, 140);
   // Score
   ctx.font='bold 72px Arial'; ctx.fillStyle='#fff';
   ctx.fillText(`${G.koreaScore} - ${G.japanScore}`, 400,230);
@@ -418,6 +425,7 @@ function resetRound() {
 function startGame() {
   G.round=0; G.koreaScore=0; G.japanScore=0;
   G.koreaResults=[]; G.japanResults=[];
+  G.suddenDeath=false;
   resetRound(); playWhistle();
 }
 
@@ -495,8 +503,24 @@ function loop(ts) {
     G.resultTimer-=dt;
     if (G.resultTimer<=0) {
       G.round++;
-      if (G.round>=G.maxRounds) G.phase='end';
-      else resetRound();
+      if (G.round >= G.maxRounds) {
+        if (G.koreaScore !== G.japanScore) {
+          G.phase = 'end'; // 점수 차이 → 종료
+        } else if (G.suddenDeath) {
+          // 서든 데스 라운드 후 판정
+          const lastK = G.koreaResults[G.koreaResults.length-1];
+          const lastJ = G.japanResults[G.japanResults.length-1];
+          if (lastK && !lastJ) G.phase = 'end';      // 한국 승
+          else if (!lastK && lastJ) G.phase = 'end'; // 일본 승
+          else resetRound(); // 둘 다 성공/실패 → 계속
+        } else {
+          // 5라운드 후 동점 → 서든 데스 돌입
+          G.suddenDeath = true;
+          resetRound();
+        }
+      } else {
+        resetRound();
+      }
     }
   }
 
