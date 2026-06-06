@@ -129,18 +129,17 @@
     @keyframes holoM{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
 
     .tier-badge{
-      position:absolute;top:4px;right:5px;
-      font-size:8px;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;
-      padding:2px 5px;border-radius:6px}
-    .card.lg .tier-badge{font-size:10px}
+      font-size:7px;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;
+      padding:2px 5px;border-radius:6px;flex-shrink:0}
+    .card.lg .tier-badge{font-size:9px}
     .core   .tier-badge{background:#262636;color:#8888aa}
     .fans   .tier-badge{background:#0a1838;color:#6a9aee}
     .silver .tier-badge{background:#2e2e44;color:#b8c4d8}
     .gold   .tier-badge{background:#381e00;color:#e8b84b}
     .rare   .tier-badge{background:#260840;color:#cc44ff}
 
-    .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
-    .card-pos{font-size:9px;font-weight:bold;color:#777}
+    .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;gap:2px}
+    .card-pos{font-size:9px;font-weight:bold;color:#777;flex-shrink:0}
     .card.lg .card-pos{font-size:12px}
     .card-total{font-size:18px;font-weight:900;line-height:1}
     .card.lg .card-total{font-size:26px}
@@ -201,9 +200,9 @@
       padding:12px 34px;
       background:linear-gradient(135deg,#1a7a33,#33aa55);
       border:none;border-radius:24px;color:#fff;font-size:15px;font-weight:bold;
-      cursor:pointer;box-shadow:0 3px 14px rgba(40,150,70,.4);
-      display:none;transition:all .15s}
-    .btn-save:active{transform:scale(.97)}
+      cursor:pointer;box-shadow:0 3px 14px rgba(40,150,70,.4);transition:all .15s}
+    .btn-save:active:not(:disabled){transform:scale(.97)}
+    .btn-save:disabled{background:#222233;color:#555;cursor:not-allowed;box-shadow:none}
 
     /* ══════════════ BINDER ══════════════ */
     #binderScreen{padding:16px}
@@ -316,11 +315,11 @@
 <!-- REVEAL -->
 <div id="revealScreen" class="screen">
   <div class="reveal-title">🎉 카드 획득!</div>
-  <div class="reveal-sub">카드를 탭해서 공개해봐!</div>
+  <div class="reveal-sub" id="revealSub">카드를 탭해서 공개해봐!</div>
   <div class="cards-row" id="cRow"></div>
   <div class="rev-btns">
     <button class="btn-flip" id="flipAllBtn" onclick="flipAll()">✨ 전부 공개!</button>
-    <button class="btn-save" id="saveBtn" onclick="saveCards()">바인더에 저장 →</button>
+    <button class="btn-save" id="saveBtn" onclick="saveCards()" disabled>📚 바인더에 저장</button>
   </div>
 </div>
 
@@ -660,10 +659,10 @@ function cardHTML(c, lg=false) {
     ? `<div class="custom-ph"><div class="ph-icon">✏️</div><span>자유카드!</span></div>`
     : SVG[c.pos] || SVG.FW;
   return `<div class="card ${c.tier}${s}">
-    <span class="tier-badge">${tier.lbl}</span>
     <div class="card-top">
       <span class="card-pos">${c.pos}</span>
       <span class="card-total">${c.total}</span>
+      <span class="tier-badge">${tier.lbl}</span>
     </div>
     <div class="card-avatar">${avatar}</div>
     <div class="card-name">${c.name}</div>
@@ -746,7 +745,8 @@ function renderReveal() {
       </div>
     </div>`).join('');
   document.getElementById('flipAllBtn').style.display = '';
-  document.getElementById('saveBtn').style.display = 'none';
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('revealSub').textContent = '카드를 탭해서 공개해봐!';
 }
 
 function flipCard(i) {
@@ -771,7 +771,8 @@ function flipAll() {
 function checkDone() {
   if (flipped >= pending.length) {
     document.getElementById('flipAllBtn').style.display = 'none';
-    document.getElementById('saveBtn').style.display = '';
+    document.getElementById('saveBtn').disabled = false;
+    document.getElementById('revealSub').textContent = '바인더에 저장하자! 👇';
   }
 }
 
