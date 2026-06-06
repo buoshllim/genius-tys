@@ -29,6 +29,8 @@ const STRINGS = {
     footer: '© GENIUS TY.S. All rights reserved.',
 
     // game descriptions
+    penalty_desc: 'Korea vs Japan! 5 shots to decide the winner.',
+    play_btn: 'Play',
     mini_soccer_desc: 'A chaotic real-time 5v5 soccer game in your browser.',
     polybattle_desc: 'A fast-paced polygon battle game. Be the last shape standing.',
     great_nature_desc: 'An infinite runner set in a stunning natural world.',
@@ -64,6 +66,8 @@ const STRINGS = {
     back: '← 뒤로',
     footer: '© GENIUS TY.S. All rights reserved.',
 
+    penalty_desc: '한국 vs 일본! 5번의 슛으로 승부를 결정하라.',
+    play_btn: '플레이',
     mini_soccer_desc: '브라우저에서 즐기는 혼돈의 5v5 실시간 축구 게임.',
     polybattle_desc: '빠른 템포의 폴리곤 배틀 게임. 마지막까지 살아남아라.',
     great_nature_desc: '아름다운 자연 세계를 배경으로 한 인피니티 러너.',
