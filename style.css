@@ -369,6 +369,38 @@ main {
 }
 
 /* ── Featured game tile ── */
+.featured-layout {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+}
+
+.featured-img {
+  width: 45%;
+  max-width: 420px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  box-shadow: var(--product-shadow);
+}
+
+.featured-content {
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .featured-layout {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .featured-img {
+    width: 100%;
+    max-width: none;
+  }
+  .featured-content .cta-group {
+    justify-content: center !important;
+  }
+}
+
 .featured-tag {
   font-size: 12px;
   font-weight: 600;
