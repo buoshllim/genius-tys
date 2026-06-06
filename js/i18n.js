@@ -11,7 +11,7 @@ const STRINGS = {
     featured_desc1: 'A fast-paced 5v5 browser soccer game.',
     featured_desc2: 'Jump in and play with your friends right now!',
     featured_cta: "LET'S PLAY NOW",
-    featured_all: 'See All Games →',
+    featured_all: 'See All Builds →',
 
     games_title: 'Games & Apps',
     games_sub: 'Everything I\'ve built.',
@@ -47,7 +47,7 @@ const STRINGS = {
     featured_desc1: '빠른 템포의 5v5 브라우저 축구 게임.',
     featured_desc2: '지금 바로 친구들과 함께 플레이해 봐!',
     featured_cta: "지금 바로 플레이!",
-    featured_all: '모든 게임 보기 →',
+    featured_all: '모든 빌드 보기 →',
 
     games_title: '게임 & 앱',
     games_sub: '내가 만든 것들.',
