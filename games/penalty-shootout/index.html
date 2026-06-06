@@ -435,8 +435,8 @@ function loop(ts) {
         G.isGoal=koreaCheckGoal();
         if (G.isGoal) G.koreaScore++;
         G.koreaResults.push(G.isGoal);
-        playCrowd(G.isGoal);
         G.phase='korea_result'; G.resultTimer=2;
+        const _kr=G.isGoal; setTimeout(()=>playCrowd(_kr),0);
       }
     }
   }
@@ -464,8 +464,8 @@ function loop(ts) {
         G.japanBallFlying=false;
         G.japanResults.push(G.japanIsGoal);
         if (G.japanIsGoal) G.japanScore++;
-        playCrowd(G.japanIsGoal);
         G.phase='japan_result'; G.resultTimer=2;
+        const _jr=G.japanIsGoal; setTimeout(()=>playCrowd(_jr),0);
       }
     }
   }
