@@ -729,8 +729,9 @@ function nextTime() {
 async function doOpen() {
   load(true);
   const ok = await canOpen();
+  if (!ok) { load(false); toast('오늘은 이미 열었어! ' + nextTime()); return; }
+  await db.upsert('tys_pack_opens', { user_id:user.id, last_opened_at:new Date().toISOString() });
   load(false);
-  if (!ok) { toast('오늘은 이미 열었어! ' + nextTime()); return; }
   pending = Array.from({length:5}, () => makeCard(Math.random() < .10));
   flipped = 0;
   go('reveal');
@@ -782,7 +783,6 @@ function checkDone() {
 async function saveCards() {
   load(true);
   try {
-    await db.upsert('tys_pack_opens', { user_id:user.id, last_opened_at:new Date().toISOString() });
     const rows = pending.map(c => ({
       id:c.id, user_id:c.user_id, tier:c.tier,
       name:c.name, nat:c.nat, team:c.team, pos:c.pos,
