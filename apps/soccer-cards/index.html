@@ -277,6 +277,96 @@
       width:38px;height:38px;border:3px solid #2a2a3a;
       border-top-color:#8844ee;border-radius:50%;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ══════════════ BATTLE ══════════════ */
+    #battleScreen{padding:16px;flex-direction:column;gap:14px}
+    .bt-sub{display:flex;flex-direction:column;gap:14px}
+    .bt-title{font-size:20px;font-weight:900;text-align:center;padding-top:8px}
+    .bt-sub-lbl{font-size:12px;color:var(--muted);text-align:center}
+
+    /* Mode select */
+    .bt-mode-btns{display:flex;gap:12px}
+    .bt-mode-btn{flex:1;padding:18px 8px;border-radius:14px;border:1.5px solid #2a2a3e;
+      background:#101018;color:#fff;font-size:13px;font-weight:bold;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .2s}
+    .bt-mode-btn:active{border-color:#e8b84b;transform:scale(.97)}
+    .bt-mode-icon{font-size:36px}
+
+    /* Card select */
+    .bt-csel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:55vh;overflow-y:auto}
+    .bt-csel-item{cursor:pointer;border-radius:10px;border:2px solid transparent;transition:all .15s;transform:scale(.95)}
+    .bt-csel-item:hover{border-color:#7744ee;transform:scale(1)}
+    .bt-csel-item.selected{border-color:#e8b84b;transform:scale(1)}
+
+    /* Arena */
+    .bt-arena-hdr{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+    .bt-round-lbl{font-size:13px;font-weight:bold;color:#aaa}
+    .bt-scores{font-size:14px;color:#fff;font-weight:900;letter-spacing:2px}
+    .bt-vs{display:flex;gap:8px;align-items:flex-start;justify-content:center}
+    .bt-vs-side{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+    .bt-vs-lbl{font-size:10px;color:#666;font-weight:bold;letter-spacing:1px}
+    .bt-vs-sep{display:flex;align-items:center;padding-top:30px;font-size:20px;color:#333;font-weight:bold}
+    .bt-card-sm{transform:scale(.88);transform-origin:top center;width:108px}
+
+    .bt-stat-row{display:flex;flex-direction:column;gap:6px}
+    .bt-stat-title{font-size:12px;color:#888;text-align:center}
+    .bt-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+    .bt-stat-btn{padding:9px 4px;border-radius:8px;border:1.5px solid #2a2a3e;
+      background:#101018;color:#eee;font-size:12px;font-weight:bold;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .15s}
+    .bt-stat-btn:hover:not(:disabled):not(.used){border-color:#7744ee;background:#14142a}
+    .bt-stat-btn.used{opacity:.25;cursor:not-allowed}
+    .bt-stat-btn:disabled:not(.used){opacity:.5;cursor:not-allowed}
+    .bt-stat-key{font-size:8px;color:#555}
+    .bt-stat-btn:not(.used) .bt-stat-key{color:#888}
+
+    /* Round result */
+    .bt-rr{background:#131320;border:1px solid #2a2a3e;border-radius:14px;
+      padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+    .bt-rr-win{font-size:22px;font-weight:900;color:#4ade80}
+    .bt-rr-lose{font-size:22px;font-weight:900;color:#f87171}
+    .bt-rr-draw{font-size:22px;font-weight:900;color:#facc15}
+    .bt-rr-detail{font-size:12px;color:#888;line-height:1.8}
+    .bt-next-btn{padding:12px 30px;border-radius:24px;
+      background:linear-gradient(135deg,#5533bb,#8844ee);
+      border:none;color:#fff;font-size:14px;font-weight:bold;cursor:pointer;margin-top:4px}
+
+    /* Final */
+    .bt-final{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:10px 0}
+    .bt-final-icon{font-size:56px}
+    .bt-final-title{font-size:26px;font-weight:900}
+    .bt-final-score{font-size:14px;color:#aaa}
+    .bt-final-rounds{width:100%;background:#101018;border-radius:12px;padding:12px;
+      display:flex;flex-direction:column;gap:0}
+    .bt-fr-row{display:flex;justify-content:space-between;align-items:center;
+      font-size:11px;padding:6px 4px;border-bottom:1px solid #1a1a2a}
+    .bt-fr-row:last-child{border-bottom:none}
+    .bt-fr-left,.bt-fr-right{font-weight:bold;width:80px}
+    .bt-fr-left{text-align:left}.bt-fr-right{text-align:right}
+    .bt-fr-mid{color:#555;font-size:10px}
+    .home-win .bt-fr-left{color:#4ade80}.home-win .bt-fr-right{color:#666}
+    .away-win .bt-fr-right{color:#4ade80}.away-win .bt-fr-left{color:#666}
+    .draw-row .bt-fr-left,.draw-row .bt-fr-right{color:#facc15}
+    .bt-replay-btn{padding:12px 30px;border-radius:24px;
+      background:#1e1e2e;border:1px solid #3a3a5a;
+      color:#aaa;font-size:14px;cursor:pointer;width:100%}
+
+    /* Multiplayer lobby */
+    .bt-room-code{font-size:36px;font-weight:900;letter-spacing:6px;color:#e8b84b;text-align:center}
+    .bt-room-status{font-size:13px;color:#aaa;text-align:center;line-height:1.7}
+    .bt-room-input{width:100%;padding:14px;background:#141420;border:1.5px solid var(--border);
+      border-radius:10px;color:#fff;font-size:22px;font-weight:bold;text-align:center;
+      letter-spacing:6px;outline:none}
+    .bt-room-input:focus{border-color:#7744ee}
+    .bt-multi-btns{display:flex;gap:10px}
+    .bt-multi-create{flex:1;padding:14px;border-radius:10px;border:none;
+      background:linear-gradient(135deg,#5533bb,#8844ee);color:#fff;font-size:14px;font-weight:bold;cursor:pointer}
+    .bt-multi-join{flex:1;padding:14px;border-radius:10px;
+      background:#1e1e2e;border:1px solid #2a2a3e;color:#aaa;font-size:14px;font-weight:bold;cursor:pointer}
+    .bt-back{background:none;border:none;color:#555;font-size:13px;cursor:pointer;align-self:flex-start;padding:0}
+    .bt-waiting-icon{font-size:48px;animation:pulse 1.4s ease-in-out infinite alternate}
+    @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.08)}}
+    .bt-cpu-thinking{font-size:12px;color:#888;text-align:center;animation:pulse 0.8s ease-in-out infinite alternate}
   </style>
 </head>
 <body>
@@ -285,6 +375,7 @@
 
 <nav class="nav" id="nav" style="display:none">
   <button class="nav-btn active" id="navPack" onclick="go('pack')">⚽ 팩 열기</button>
+  <button class="nav-btn" id="navBattle" onclick="go('battle')">⚔️ 배틀</button>
   <button class="nav-btn" id="navBinder" onclick="go('binder')">📚 바인더</button>
 </nav>
 
@@ -326,6 +417,73 @@
     <button class="btn-flip" id="flipAllBtn" onclick="flipAll()">✨ 전부 공개!</button>
     <button class="btn-save" id="saveBtn" onclick="saveCards()" disabled>📚 바인더에 저장</button>
   </div>
+</div>
+
+<!-- BATTLE -->
+<div id="battleScreen" class="screen">
+  <!-- Mode select -->
+  <div id="btMode" class="bt-sub">
+    <div class="bt-title">⚔️ 카드 배틀</div>
+    <div class="bt-sub-lbl">내 카드로 배틀해봐!<br>5라운드 + 총합 비교로 승부 결정!</div>
+    <div class="bt-mode-btns">
+      <button class="bt-mode-btn" onclick="btStartSolo()">
+        <span class="bt-mode-icon">🤖</span>
+        <span>CPU와 배틀</span>
+        <span style="font-size:10px;color:#666;font-weight:normal">혼자서 도전!</span>
+      </button>
+      <button class="bt-mode-btn" onclick="btShowMulti()">
+        <span class="bt-mode-icon">🌐</span>
+        <span>친구와 배틀</span>
+        <span style="font-size:10px;color:#666;font-weight:normal">같이 해봐!</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Multiplayer lobby -->
+  <div id="btMulti" class="bt-sub" style="display:none">
+    <div class="bt-title">🌐 친구와 배틀</div>
+    <button class="bt-back" onclick="btShowMode()">← 돌아가기</button>
+    <div id="btMultiLobby">
+      <div class="bt-room-status">방을 만들거나<br>친구한테 받은 코드를 입력해봐!</div>
+      <input class="bt-room-input" id="btRoomInput" placeholder="코드 입력" maxlength="6" style="text-transform:uppercase">
+      <div class="bt-multi-btns">
+        <button class="bt-multi-create" onclick="btCreateRoom()">방 만들기</button>
+        <button class="bt-multi-join" onclick="btJoinRoom()">참가하기</button>
+      </div>
+    </div>
+    <div id="btMultiWaiting" style="display:none">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px 0">
+        <div class="bt-waiting-icon">⏳</div>
+        <div class="bt-room-code" id="btRoomCode"></div>
+        <div class="bt-room-status">이 코드를 친구한테 알려줘!<br>친구가 접속하면 배틀 시작!</div>
+        <button class="bt-replay-btn" onclick="btLeaveRoom()">방 나가기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card select -->
+  <div id="btCardSel" class="bt-sub" style="display:none">
+    <div class="bt-title" id="btCardSelTitle">카드를 골라봐!</div>
+    <div class="bt-sub-lbl">배틀에 쓸 카드 1장 선택</div>
+    <div class="bt-csel-grid" id="btCardGrid"></div>
+  </div>
+
+  <!-- Arena -->
+  <div id="btArena" class="bt-sub" style="display:none">
+    <div class="bt-arena-hdr">
+      <span class="bt-round-lbl" id="btRoundLbl">Round 1 / 5</span>
+      <span class="bt-scores" id="btScoreLbl">0 : 0</span>
+    </div>
+    <div class="bt-vs" id="btVs"></div>
+    <div class="bt-stat-row" id="btStatRow">
+      <div class="bt-stat-title" id="btStatTitle">어떤 능력치로 배틀할까?</div>
+      <div class="bt-stats" id="btStatBtns"></div>
+    </div>
+    <div id="btRoundResult" style="display:none"></div>
+  </div>
+
+  <!-- Final result -->
+  <div id="btFinal" class="bt-sub" style="display:none"></div>
 </div>
 
 <!-- BINDER -->
@@ -900,11 +1058,12 @@ function closeDifBg(e) { if (e.target===document.getElementById('detailOv')) clo
 // NAVIGATION
 // ═══════════════════════════════════════════════════════
 function go(name) {
-  ['pack','reveal','binder'].forEach(s => document.getElementById(s+'Screen').classList.remove('active'));
-  ['Pack','Binder'].forEach(b => document.getElementById('nav'+b).classList.remove('active'));
+  ['pack','reveal','battle','binder'].forEach(s => document.getElementById(s+'Screen').classList.remove('active'));
+  ['Pack','Battle','Binder'].forEach(b => document.getElementById('nav'+b).classList.remove('active'));
   document.getElementById(name+'Screen').classList.add('active');
   if (name==='pack')   { document.getElementById('navPack').classList.add('active'); updatePackUI(); }
   if (name==='reveal') { document.getElementById('navPack').classList.add('active'); renderReveal(); }
+  if (name==='battle') { document.getElementById('navBattle').classList.add('active'); btShowMode(); }
   if (name==='binder') { document.getElementById('navBinder').classList.add('active'); renderBinder(); }
 }
 
@@ -939,6 +1098,385 @@ function doLogout() {
   document.getElementById('loginScreen').classList.add('active');
   document.getElementById('lnick').value = '';
   document.getElementById('lpin').value = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// BATTLE
+// ═══════════════════════════════════════════════════════
+const STATS = ['atk','pas','def','spd','stm'];
+const STAT_LBL = {atk:'ATK',pas:'PAS',def:'DEF',spd:'SPD',stm:'STM',total:'TOTAL'};
+const PARTY_URL = 'wss://card-battle.buoshllim.partykit.dev/parties/main';
+
+let bt = {
+  mode: null,         // 'solo' | 'multi'
+  myCard: null,
+  cpuCard: null,
+  round: 1,
+  myUsed: [],
+  cpuUsed: [],
+  myScore: 0,
+  cpuScore: 0,
+  rounds: [],
+  roundPending: false, // waiting for next-round tap
+  // multiplayer
+  ws: null,
+  role: null,         // 'home' | 'away'
+  roomCode: null,
+  serverState: null,
+};
+
+function btSub(id) {
+  ['btMode','btMulti','btCardSel','btArena','btFinal'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? '' : 'none';
+  });
+}
+
+function btShowMode() {
+  btCleanupWs();
+  bt = { mode:null, myCard:null, cpuCard:null, round:1, myUsed:[], cpuUsed:[], myScore:0, cpuScore:0, rounds:[], roundPending:false, ws:null, role:null, roomCode:null, serverState:null };
+  btSub('btMode');
+}
+
+function btShowMulti() {
+  document.getElementById('btMultiLobby').style.display = '';
+  document.getElementById('btMultiWaiting').style.display = 'none';
+  document.getElementById('btRoomInput').value = '';
+  btSub('btMulti');
+}
+
+// ── Card select ──
+function btStartSolo() {
+  bt.mode = 'solo';
+  btShowCardSel('카드를 골라봐! (CPU와 배틀)');
+}
+
+function btShowCardSel(title) {
+  document.getElementById('btCardSelTitle').textContent = title;
+  const grid = document.getElementById('btCardGrid');
+  if (!collection.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#666;padding:40px 0">카드가 없어!<br>팩을 먼저 열어봐 🎴</div>`;
+  } else {
+    const sorted = [...collection].sort((a,b) => b.total - a.total);
+    grid.innerHTML = sorted.map(c =>
+      `<div class="bt-csel-item" id="bcs_${c.id}" onclick="btSelectCard('${c.id}')">${cardHTML(c)}</div>`
+    ).join('');
+  }
+  btSub('btCardSel');
+}
+
+function btSelectCard(id) {
+  document.querySelectorAll('.bt-csel-item').forEach(el => el.classList.remove('selected'));
+  document.getElementById('bcs_'+id).classList.add('selected');
+  bt.myCard = collection.find(c => c.id === id);
+  setTimeout(() => {
+    if (bt.mode === 'solo') btStartArena();
+    else btMultiSendCard();
+  }, 200);
+}
+
+// ── Solo arena ──
+function btStartArena() {
+  if (bt.mode === 'solo') {
+    bt.cpuCard = makeCard(false);
+    bt.cpuCard.name = 'CPU 선수';
+  }
+  btRenderArena();
+  btSub('btArena');
+}
+
+function btRenderArena() {
+  const my = bt.myCard, opp = bt.mode === 'solo' ? bt.cpuCard : btGetOppCard();
+  document.getElementById('btRoundLbl').textContent = `Round ${bt.round} / 5`;
+  document.getElementById('btScoreLbl').textContent = `${bt.myScore} : ${(bt.mode === 'solo' ? bt.cpuScore : btGetOppScore())}`;
+
+  const myStatHighlight = bt.rounds.length ? STAT_LBL[bt.rounds[bt.rounds.length-1]?.myStat] : '';
+  document.getElementById('btVs').innerHTML = `
+    <div class="bt-vs-side">
+      <div class="bt-vs-lbl">나</div>
+      <div class="bt-card-sm">${cardHTML(my)}</div>
+    </div>
+    <div class="bt-vs-sep">VS</div>
+    <div class="bt-vs-side">
+      <div class="bt-vs-lbl">${bt.mode==='solo' ? 'CPU' : '상대'}</div>
+      <div class="bt-card-sm">${cardHTML(opp)}</div>
+    </div>`;
+
+  document.getElementById('btRoundResult').style.display = 'none';
+  document.getElementById('btStatRow').style.display = '';
+
+  const allUsed = bt.myUsed.length >= 5;
+  document.getElementById('btStatTitle').textContent = allUsed ? '모든 라운드 완료!' : '어떤 능력치로 배틀할까?';
+  document.getElementById('btStatBtns').innerHTML = STATS.map(s => {
+    const used = bt.myUsed.includes(s);
+    return `<button class="bt-stat-btn${used?' used':''}" onclick="btPickStat('${s}')" ${used||bt.roundPending?'disabled':''}>
+      <span>${my[s]}</span><span class="bt-stat-key">${STAT_LBL[s]}</span>
+    </button>`;
+  }).join('');
+}
+
+function btPickStat(stat) {
+  if (bt.myUsed.includes(stat) || bt.roundPending) return;
+  bt.roundPending = true;
+
+  // CPU greedy: pick its best remaining stat
+  let cpuStat;
+  if (bt.mode === 'solo') {
+    const remaining = STATS.filter(s => !bt.cpuUsed.includes(s));
+    cpuStat = remaining.reduce((best, s) => bt.cpuCard[s] > bt.cpuCard[best] ? s : best, remaining[0]);
+  }
+
+  const myVal = bt.myCard[stat];
+  const oppVal = bt.mode === 'solo' ? bt.cpuCard[cpuStat] : null; // multi handled elsewhere
+
+  if (bt.mode === 'solo') {
+    bt.myUsed.push(stat);
+    bt.cpuUsed.push(cpuStat);
+    let w;
+    if (myVal > oppVal)       { w = 'my'; bt.myScore++; }
+    else if (oppVal > myVal)  { w = 'opp'; bt.cpuScore++; }
+    else                      { w = 'draw'; bt.myScore += 0.5; bt.cpuScore += 0.5; }
+    const result = { round: bt.round, myStat: stat, oppStat: cpuStat, myVal, oppVal, winner: w };
+    bt.rounds.push(result);
+    btShowRoundResult(result, myVal, oppVal, stat, cpuStat);
+  }
+}
+
+function btShowRoundResult(result, myVal, oppVal, myStat, oppStat) {
+  const isLast = bt.round >= 5;
+  const winText = result.winner === 'my' ? '내가 이겼다! 🎉' : result.winner === 'opp' ? '졌어... 😅' : '비겼어! 🤝';
+  const cls = result.winner === 'my' ? 'bt-rr-win' : result.winner === 'opp' ? 'bt-rr-lose' : 'bt-rr-draw';
+  document.getElementById('btStatRow').style.display = 'none';
+  document.getElementById('btRoundResult').style.display = '';
+  document.getElementById('btRoundResult').innerHTML = `
+    <div class="bt-rr">
+      <div class="${cls}">${winText}</div>
+      <div class="bt-rr-detail">
+        내 ${STAT_LBL[myStat]} <strong>${myVal}</strong> vs 상대 ${STAT_LBL[oppStat]} <strong>${oppVal}</strong>
+      </div>
+      <div style="font-size:13px;color:#888">현재 스코어: ${bt.myScore} : ${bt.mode==='solo'?bt.cpuScore:btGetOppScore()}</div>
+      <button class="bt-next-btn" onclick="${isLast ? 'btFinishSolo()' : 'btNextRound()'}">${isLast ? '결과 보기! 🏆' : '다음 라운드! →'}</button>
+    </div>`;
+}
+
+function btNextRound() {
+  bt.round++;
+  bt.roundPending = false;
+  btRenderArena();
+}
+
+function btFinishSolo() {
+  // Round 6: total comparison
+  const myTotal = bt.myCard.total, oppTotal = bt.cpuCard.total;
+  let tw;
+  if (myTotal > oppTotal)      { tw = 'my'; bt.myScore++; }
+  else if (oppTotal > myTotal) { tw = 'opp'; bt.cpuScore++; }
+  else                         { tw = 'draw'; bt.myScore += 0.5; bt.cpuScore += 0.5; }
+  bt.rounds.push({ round: 6, myStat: 'total', oppStat: 'total', myVal: myTotal, oppVal: oppTotal, winner: tw });
+
+  let finalWinner, icon, title;
+  if (bt.myScore > bt.cpuScore)       { finalWinner = 'my'; icon = '🏆'; title = '승리! 최고야!'; }
+  else if (bt.cpuScore > bt.myScore)  { finalWinner = 'opp'; icon = '😅'; title = '패배... 다시 도전!'; }
+  else                                { finalWinner = 'draw'; icon = '🤝'; title = '무승부!'; }
+
+  btShowFinal(finalWinner, icon, title, bt.myScore, bt.cpuScore, '나', 'CPU');
+}
+
+function btShowFinal(winner, icon, title, myScore, oppScore, myLbl, oppLbl) {
+  const rowsHTML = bt.rounds.map(r => {
+    const myW = r.winner === 'my', oppW = r.winner === 'opp', isDraw = r.winner === 'draw';
+    const cls = myW ? 'home-win' : oppW ? 'away-win' : 'draw-row';
+    const lbl = r.round === 6 ? '(TOTAL)' : `Round ${r.round}`;
+    return `<div class="bt-fr-row ${cls}">
+      <span class="bt-fr-left">${STAT_LBL[r.myStat]} ${r.myVal}</span>
+      <span style="font-size:10px;color:#444">${lbl}</span>
+      <span class="bt-fr-right">${r.oppVal} ${STAT_LBL[r.oppStat]}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('btFinal').innerHTML = `
+    <div class="bt-final">
+      <div class="bt-final-icon">${icon}</div>
+      <div class="bt-final-title">${title}</div>
+      <div class="bt-final-score">${myLbl} ${myScore} : ${oppScore} ${oppLbl}</div>
+      <div class="bt-final-rounds">${rowsHTML}</div>
+      <button class="bt-next-btn" onclick="btStartSolo()" style="width:100%">다시 배틀! ⚔️</button>
+      <button class="bt-replay-btn" onclick="btShowMode()">모드 선택으로</button>
+    </div>`;
+  btSub('btFinal');
+}
+
+// ── Multiplayer ──
+function btCreateRoom() {
+  const code = Math.random().toString(36).substring(2,8).toUpperCase();
+  bt.roomCode = code;
+  btConnectWs(code);
+}
+
+function btJoinRoom() {
+  const code = document.getElementById('btRoomInput').value.trim().toUpperCase();
+  if (code.length < 4) { toast('코드를 입력해!'); return; }
+  bt.roomCode = code;
+  btConnectWs(code);
+}
+
+function btConnectWs(code) {
+  btCleanupWs();
+  bt.mode = 'multi';
+  const ws = new WebSocket(`${PARTY_URL}/${code}`);
+  bt.ws = ws;
+
+  ws.onopen = () => {};
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'assigned') {
+      bt.role = msg.role;
+      document.getElementById('btMultiLobby').style.display = 'none';
+      document.getElementById('btMultiWaiting').style.display = '';
+      document.getElementById('btRoomCode').textContent = code;
+    }
+    if (msg.type === 'error') { toast(msg.msg); btCleanupWs(); btShowMulti(); }
+    if (msg.type === 'state') btHandleServerState(msg.state);
+  };
+  ws.onerror = () => { toast('연결 오류!'); btCleanupWs(); };
+  ws.onclose = () => { if (bt.mode === 'multi' && bt.serverState?.phase !== 'done') toast('연결이 끊겼어!'); };
+}
+
+function btHandleServerState(state) {
+  bt.serverState = state;
+  const mySlot = state[bt.role];
+  const oppSlot = state[bt.role === 'home' ? 'away' : 'home'];
+
+  if (state.phase === 'card_select' && !mySlot?.card) {
+    btShowCardSel('카드를 골라봐! (친구와 배틀)');
+    return;
+  }
+  if (state.phase === 'card_select' && mySlot?.card && !oppSlot?.card) {
+    btSub('btArena');
+    document.getElementById('btVs').innerHTML = `<div style="text-align:center;padding:40px 0;color:#888">상대방이 카드 고르는 중... ⏳</div>`;
+    document.getElementById('btStatRow').style.display = 'none';
+    document.getElementById('btRoundResult').style.display = 'none';
+    return;
+  }
+  if (state.phase === 'picking' || (state.phase === 'picking' && mySlot?.pickedStat)) {
+    bt.myCard = mySlot.card;
+    bt.myUsed = mySlot.usedStats;
+    bt.round = state.round;
+    bt.myScore = mySlot.score;
+    bt.rounds = state.rounds.map(r => ({
+      round: r.round,
+      myStat: bt.role === 'home' ? r.homeStat : r.awayStat,
+      oppStat: bt.role === 'home' ? r.awayStat : r.homeStat,
+      myVal: bt.role === 'home' ? r.homeVal : r.awayVal,
+      oppVal: bt.role === 'home' ? r.awayVal : r.homeVal,
+      winner: r.winner === bt.role ? 'my' : r.winner === 'draw' ? 'draw' : 'opp',
+    }));
+    btSub('btArena');
+    btRenderMultiArena(state, mySlot, oppSlot);
+    return;
+  }
+  if (state.phase === 'done') {
+    bt.myCard = mySlot.card;
+    bt.rounds = state.rounds.map(r => ({
+      round: r.round,
+      myStat: bt.role === 'home' ? r.homeStat : r.awayStat,
+      oppStat: bt.role === 'home' ? r.awayStat : r.homeStat,
+      myVal: bt.role === 'home' ? r.homeVal : r.awayVal,
+      oppVal: bt.role === 'home' ? r.awayVal : r.homeVal,
+      winner: r.winner === bt.role ? 'my' : r.winner === 'draw' ? 'draw' : 'opp',
+    }));
+    const iWin = state.winner === bt.role;
+    const isDraw = state.winner === 'draw';
+    const icon = iWin ? '🏆' : isDraw ? '🤝' : '😅';
+    const title = iWin ? '승리! 최고야!' : isDraw ? '무승부!' : '패배... 다시 도전!';
+    btShowFinal(iWin?'my':isDraw?'draw':'opp', icon, title, mySlot.score, oppSlot.score, '나', '상대');
+  }
+}
+
+function btRenderMultiArena(state, mySlot, oppSlot) {
+  const opp = oppSlot?.card;
+  document.getElementById('btRoundLbl').textContent = `Round ${state.round} / 5`;
+  document.getElementById('btScoreLbl').textContent = `${mySlot.score} : ${oppSlot?.score ?? 0}`;
+
+  document.getElementById('btVs').innerHTML = `
+    <div class="bt-vs-side">
+      <div class="bt-vs-lbl">나</div>
+      <div class="bt-card-sm">${cardHTML(mySlot.card)}</div>
+    </div>
+    <div class="bt-vs-sep">VS</div>
+    <div class="bt-vs-side">
+      <div class="bt-vs-lbl">상대</div>
+      <div class="bt-card-sm">${cardHTML(opp)}</div>
+    </div>`;
+
+  const myPicked = !!mySlot.pickedStat;
+  const oppPicked = !!oppSlot?.pickedStat;
+
+  if (myPicked && !oppPicked) {
+    // Waiting for opponent
+    document.getElementById('btStatRow').style.display = 'none';
+    document.getElementById('btRoundResult').style.display = '';
+    document.getElementById('btRoundResult').innerHTML = `<div class="bt-rr"><div class="bt-cpu-thinking">상대방이 고르는 중... ⏳</div></div>`;
+    return;
+  }
+
+  // Show last round result if rounds array has this round's result
+  const lastRound = state.rounds[state.rounds.length - 1];
+  if (lastRound && lastRound.round === state.round - 1) {
+    const myVal = bt.role === 'home' ? lastRound.homeVal : lastRound.awayVal;
+    const oppVal = bt.role === 'home' ? lastRound.awayVal : lastRound.homeVal;
+    const myStat = bt.role === 'home' ? lastRound.homeStat : lastRound.awayStat;
+    const oppStat = bt.role === 'home' ? lastRound.awayStat : lastRound.homeStat;
+    const myWin = lastRound.winner === bt.role;
+    const isDraw = lastRound.winner === 'draw';
+    const result = { winner: myWin ? 'my' : isDraw ? 'draw' : 'opp' };
+    document.getElementById('btStatRow').style.display = 'none';
+    document.getElementById('btRoundResult').style.display = '';
+    document.getElementById('btRoundResult').innerHTML = `
+      <div class="bt-rr">
+        <div class="${myWin?'bt-rr-win':isDraw?'bt-rr-draw':'bt-rr-lose'}">${myWin?'이겼다! 🎉':isDraw?'비겼어! 🤝':'졌어... 😅'}</div>
+        <div class="bt-rr-detail">내 ${STAT_LBL[myStat]} <strong>${myVal}</strong> vs 상대 ${STAT_LBL[oppStat]} <strong>${oppVal}</strong></div>
+        <button class="bt-next-btn" onclick="btMultiNextRound()">다음 라운드! →</button>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('btRoundResult').style.display = 'none';
+  document.getElementById('btStatRow').style.display = '';
+  document.getElementById('btStatTitle').textContent = '어떤 능력치로 배틀할까?';
+  document.getElementById('btStatBtns').innerHTML = STATS.map(s => {
+    const used = mySlot.usedStats.includes(s);
+    return `<button class="bt-stat-btn${used?' used':''}" onclick="btMultiPickStat('${s}')" ${used||myPicked?'disabled':''}>
+      <span>${mySlot.card[s]}</span><span class="bt-stat-key">${STAT_LBL[s]}</span>
+    </button>`;
+  }).join('');
+}
+
+function btMultiPickStat(stat) {
+  if (!bt.ws || bt.ws.readyState !== WebSocket.OPEN) return;
+  bt.ws.send(JSON.stringify({ type: 'pick_stat', stat }));
+}
+
+function btMultiSendCard() {
+  if (!bt.ws || bt.ws.readyState !== WebSocket.OPEN) { toast('연결이 없어!'); return; }
+  bt.ws.send(JSON.stringify({ type: 'select_card', card: bt.myCard }));
+}
+
+function btMultiNextRound() {
+  // Just re-render; next pick will update state
+  const state = bt.serverState;
+  if (!state) return;
+  const mySlot = state[bt.role];
+  const oppSlot = state[bt.role === 'home' ? 'away' : 'home'];
+  btRenderMultiArena(state, mySlot, oppSlot);
+}
+
+function btGetOppCard() { return bt.mode === 'multi' ? bt.serverState?.[bt.role==='home'?'away':'home']?.card : bt.cpuCard; }
+function btGetOppScore() { return bt.mode === 'multi' ? (bt.serverState?.[bt.role==='home'?'away':'home']?.score ?? 0) : bt.cpuScore; }
+
+function btLeaveRoom() { btCleanupWs(); btShowMulti(); }
+
+function btCleanupWs() {
+  if (bt.ws) { bt.ws.onclose = null; bt.ws.close(); bt.ws = null; }
 }
 
 // ═══════════════════════════════════════════════════════
